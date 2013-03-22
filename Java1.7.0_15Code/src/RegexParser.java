@@ -12,7 +12,7 @@ public class RegexParser {
         reg_ex();
     }
 
-    private enum terminal {UNION, PAR_OPEN, PAR_CLOSE, RE_CHAR, STAR, PLUS, PERIOD, SQUARE_OPEN, DOLLAR, CLS_CHAR, SQUARE_CLOSE, CARROT, DASH, I, N}
+    private enum terminal {UNION, PAR_OPEN, PAR_CLOSE, RE_CHAR, STAR, PLUS, PERIOD, SQUARE_OPEN, DOLLAR, CLS_CHAR, SQUARE_CLOSE, CARROT, DASH, IN}
 
     private terminal peekToken() {
         return null;
@@ -175,8 +175,7 @@ public class RegexParser {
         matchToken(terminal.CARROT);
         char_set();
         matchToken(terminal.SQUARE_CLOSE);
-        matchToken(terminal.I);
-        matchToken(terminal.N);
+        matchToken(terminal.IN);
         exclude_set_tail();
     }
 
