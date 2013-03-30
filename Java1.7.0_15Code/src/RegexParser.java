@@ -1,6 +1,13 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 
 /**
+ * The RegexParser class parses the regex on each line of the Spec file by
+ * 1. feeding that line to a SpecReader and then
+ * 2. parsing the regex using a recursive descent parser which
+ * 3. requests tokens from the SpecReader to decide how to parse
+ *
  * Created with IntelliJ IDEA.
  * User: Mickey
  * Date: 2/24/13
@@ -8,32 +15,57 @@ import java.io.File;
  * To change this template use File | Settings | File Templates.
  */
 public class RegexParser {
-    public RegexParser(File f) {
-        reg_ex();
-    }
 
-    private enum terminal {UNION, PAR_OPEN, PAR_CLOSE, RE_CHAR, STAR, PLUS, PERIOD, SQUARE_OPEN, DOLLAR, CLS_CHAR, SQUARE_CLOSE, CARROT, DASH, IN}
+    SpecReader specReader;
+    BufferedReader br;
+    // just for checking if there are still lines in the Spec file
+    BufferedReader checker;
 
-    private terminal peekToken() {
-        return null;
-    }
-
-    private void matchToken(terminal expected) {
-        terminal received = null;
-        if (received != expected) {
-            throwError(received, expected);
+    /**
+     * Constructor creates two BufferedReaders for the same Spec file,
+     * one for the SpecReader and one just to check for the end of the file,
+     * and creates a SpecReader
+     * @param spec :the Spec file
+     */
+    public RegexParser(File spec) {
+        try {
+            br = new BufferedReader(new FileReader(spec));
+            checker = new BufferedReader(new FileReader(spec));
+            specReader = new SpecReader(br);
+        }
+        catch (Exception e) {
+            System.out.println("Regex parser construction error");
+            System.exit(0);
         }
     }
 
-    private void throwError(terminal token, terminal... expected) {
-        System.out.print("Got " + token.toString() + "... expecting ");
-        for (int i = 0; i < expected.length - 1; i++) {
-            System.out.print(expected[i].toString() + " or ");
+    /**
+     * Parses the entire Spec file
+     */
+    public void parse() {
+        try {
+            // while not at the end of the Spec file
+            while (checker.readLine() != null) {
+                // if the line can be split up into a class and a corresponding regex
+                if (specReader.set_up_new_line()) {
+                    // parse through the regex using a recursive descent parser
+                    reg_ex();
+                    // if the recursive descent parser finishes, then make sure the entire regex has been parsed, otherwise throw an error
+                    specReader.matchToken(SpecReader.terminal.END);
+                    // if the recursive descent parser finishes and the entire regex has been parsed, then the parse for that line was successful
+                    System.out.println("Parse successful!");
+                }
+            }
         }
-        System.out.println(expected[expected.length - 1]);
-        System.exit(0);
+        catch (Exception E) {
+            System.out.println("readLine error");
+            System.exit(0);
+        }
     }
 
+    /**
+     * The root of the recursive descent parser
+     */
     private void reg_ex() {
         rexp();
     }
@@ -44,9 +76,9 @@ public class RegexParser {
     }
 
     private void rexp_prime() {
-        terminal token = peekToken();
-        if (token == terminal.UNION) {
-            matchToken(token);
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.UNION) {
+            specReader.matchToken(token);
             rexp1();
             rexp_prime();
         }
@@ -61,8 +93,8 @@ public class RegexParser {
     }
 
     private void rexp1_prime() {
-        terminal token = peekToken();
-        if (token == terminal.PAR_OPEN || token == terminal.RE_CHAR || token == terminal.PERIOD || token == terminal.SQUARE_OPEN || token == terminal.DOLLAR) {
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.PAR_OPEN || token == SpecReader.terminal.RE_CHAR || token == SpecReader.terminal.PERIOD || token == SpecReader.terminal.SQUARE_OPEN || token == SpecReader.terminal.DEFINED) {
             rexp2();
             rexp1_prime();
         }
@@ -72,15 +104,15 @@ public class RegexParser {
     }
 
     private void rexp2() {
-        terminal token = peekToken();
-        if (token == terminal.PAR_OPEN) {
-            matchToken(token);
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.PAR_OPEN) {
+            specReader.matchToken(token);
             rexp();
-            matchToken(terminal.PAR_CLOSE);
+            specReader.matchToken(SpecReader.terminal.PAR_CLOSE);
             rexp2_tail();
         }
-        else if (token == terminal.RE_CHAR) {
-            matchToken(token);
+        else if (token == SpecReader.terminal.RE_CHAR) {
+            specReader.matchToken(token);
             rexp2_tail();
         }
         else {
@@ -89,12 +121,12 @@ public class RegexParser {
     }
 
     private void rexp2_tail() {
-        terminal token = peekToken();
-        if (token == terminal.STAR) {
-            matchToken(token);
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.STAR) {
+            specReader.matchToken(token);
         }
-        else if (token == terminal.PLUS) {
-            matchToken(token);
+        else if (token == SpecReader.terminal.PLUS) {
+            specReader.matchToken(token);
         }
         else {
             return;
@@ -102,8 +134,8 @@ public class RegexParser {
     }
 
     private void rexp3() {
-        terminal token =  peekToken();
-        if (token == terminal.PERIOD || token == terminal.SQUARE_OPEN || token == terminal.DOLLAR) {
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.PERIOD || token == SpecReader.terminal.SQUARE_OPEN || token == SpecReader.terminal.DEFINED) {
             char_class();
         }
         else {
@@ -112,59 +144,59 @@ public class RegexParser {
     }
 
     private void char_class() {
-        terminal token =  peekToken();
-        if (token == terminal.PERIOD) {
-            matchToken(token);
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.PERIOD) {
+            specReader.matchToken(token);
         }
-        else if (token == terminal.SQUARE_OPEN) {
-            matchToken(token);
+        else if (token == SpecReader.terminal.SQUARE_OPEN) {
+            specReader.matchToken(token);
             char_class1();
         }
-        else if (token == terminal.DOLLAR) {
-            defined_class();
+        else if (token == SpecReader.terminal.DEFINED) {
+            specReader.matchToken(token);
         }
         else {
-            throwError(token, terminal.PERIOD, terminal.SQUARE_OPEN, terminal.DOLLAR);
+            specReader.throwError(token, SpecReader.terminal.PERIOD, SpecReader.terminal.SQUARE_OPEN, SpecReader.terminal.DEFINED);
         }
     }
 
     private void char_class1() {
-        terminal token = peekToken();
-        if (token == terminal.CLS_CHAR || token == terminal.SQUARE_CLOSE) {
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.CLS_CHAR || token == SpecReader.terminal.SQUARE_CLOSE) {
             char_set_list();
         }
-        else if (token == terminal.CARROT) {
+        else if (token == SpecReader.terminal.CARROT) {
             exclude_set();
         }
         else {
-            throwError(token, terminal.CLS_CHAR, terminal.SQUARE_CLOSE, terminal.CARROT);
+            specReader.throwError(token, SpecReader.terminal.CLS_CHAR, SpecReader.terminal.SQUARE_CLOSE, SpecReader.terminal.CARROT);
         }
     }
 
     private void char_set_list() {
-        terminal token = peekToken();
-        if (token == terminal.CLS_CHAR) {
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.CLS_CHAR) {
             char_set();
             char_set_list();
         }
-        else if (token == terminal.SQUARE_CLOSE) {
-            matchToken(token);
+        else if (token == SpecReader.terminal.SQUARE_CLOSE) {
+            specReader.matchToken(token);
         }
         else {
-            throwError(token, terminal.CLS_CHAR, terminal.SQUARE_CLOSE);
+            specReader.throwError(token, SpecReader.terminal.CLS_CHAR, SpecReader.terminal.SQUARE_CLOSE);
         }
     }
 
     private void char_set() {
-        matchToken(terminal.CLS_CHAR);
+        specReader.matchToken(SpecReader.terminal.CLS_CHAR);
         char_set_tail();
     }
 
     private void char_set_tail() {
-        terminal token = peekToken();
-        if (token == terminal.DASH) {
-            matchToken(token);
-            matchToken(terminal.CLS_CHAR);
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.DASH) {
+            specReader.matchToken(token);
+            specReader.matchToken(SpecReader.terminal.CLS_CHAR);
         }
         else {
             return;
@@ -172,29 +204,25 @@ public class RegexParser {
     }
 
     private void exclude_set() {
-        matchToken(terminal.CARROT);
+        specReader.matchToken(SpecReader.terminal.CARROT);
         char_set();
-        matchToken(terminal.SQUARE_CLOSE);
-        matchToken(terminal.IN);
+        specReader.matchToken(SpecReader.terminal.SQUARE_CLOSE);
+        specReader.matchToken(SpecReader.terminal.IN);
         exclude_set_tail();
     }
 
     private void exclude_set_tail() {
-        terminal token = peekToken();
-        if (token == terminal.SQUARE_OPEN) {
-            matchToken(token);
+        SpecReader.terminal token = specReader.peekToken();
+        if (token == SpecReader.terminal.SQUARE_OPEN) {
+            specReader.matchToken(token);
             char_set();
-            matchToken(terminal.SQUARE_CLOSE);
+            specReader.matchToken(SpecReader.terminal.SQUARE_CLOSE);
         }
-        else if (token == terminal.DOLLAR) {
-            defined_class();
+        else if (token == SpecReader.terminal.DEFINED) {
+            specReader.matchToken(token);
         }
         else {
-            throwError(token, terminal.SQUARE_OPEN, terminal.DOLLAR);
+            specReader.throwError(token, SpecReader.terminal.SQUARE_OPEN, SpecReader.terminal.DEFINED);
         }
-    }
-
-    private void defined_class() {
-        matchToken(terminal.DOLLAR);
     }
 }
