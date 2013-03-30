@@ -53,7 +53,7 @@ public class RegexParser {
                     // if the recursive descent parser finishes, then make sure the entire regex has been parsed, otherwise throw an error
                     specReader.matchToken(SpecReader.terminal.END);
                     // if the recursive descent parser finishes and the entire regex has been parsed, then the parse for that line was successful
-                    System.out.println("Parse successful!");
+                    // System.out.println("Parse successful!");
                 }
             }
         }

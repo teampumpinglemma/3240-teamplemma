@@ -13,6 +13,8 @@ import java.util.ArrayList;
  */
 public class SpecReader {
 
+    // are we defining tokens yet?
+    boolean tokenTime;
     // are the characters being read inside of square brackets?
     boolean inSquare;
     // the regex portion of the current line
@@ -20,7 +22,10 @@ public class SpecReader {
     // the un-parsed regex portion of the current line
     String to_read;
     // the previously defined classes
-    ArrayList<String> defined;
+    ArrayList<Definition> defined;
+    // token definitions
+    ArrayList<Definition> tokens;
+    // list of tokens for the current regex
     BufferedReader br;
 
     // the tokens provided to the RegexParser
@@ -34,8 +39,10 @@ public class SpecReader {
      * @param br :for reading the Spec file
      */
     public SpecReader(BufferedReader br) {
+        tokenTime = false;
         inSquare = false;
-        defined = new ArrayList<String>();
+        defined = new ArrayList<Definition>();
+        tokens = new ArrayList<Definition>();
         this.br = br;
     }
 
@@ -63,7 +70,12 @@ public class SpecReader {
                 System.out.println("Class definitions should start with $");
                 System.exit(0);
             }
-            defined.add(definition);
+            if (!tokenTime) {
+                defined.add(new Definition(definition));
+            }
+            else {
+                tokens.add(new Definition(definition));
+            }
             // finds the first space after the class name, and sets the beginning of the regex to that
             to_read = to_read.substring(to_read.indexOf(' '));
             to_read.trim();
@@ -71,6 +83,8 @@ public class SpecReader {
             return true;
         }
         else {
+            // an empty line signifies to start defining tokens instead of char classes
+            tokenTime = true;
             return false;
         }
     }
@@ -110,7 +124,14 @@ public class SpecReader {
                         end++;
                     }
                     // check if those characters form a defined class
-                    if (defined.contains("$" + to_read.substring(0, end))) {
+                    boolean isDefined = false;
+                    for (int i = 0; i < defined.size(); i++) {
+                        if (defined.get(i).name.equals("$" + to_read.substring(0, end))) {
+                            isDefined = true;
+                            break;
+                        }
+                    }
+                    if (isDefined) {
                         t = terminal.DEFINED;
                     }
                     // otherwise the dollar-sign is just a regular character and is not signifying a defined class
@@ -258,7 +279,14 @@ public class SpecReader {
                     while (end < to_read.length() && ((to_read.charAt(end) >= 'A' && to_read.charAt(end) <= 'Z') || (to_read.charAt(end) >= '0' && to_read.charAt(end) <= '9'))) {
                         end++;
                     }
-                    if (defined.contains("$" + to_read.substring(0, end))) {
+                    boolean isDefined = false;
+                    for (int i = 0; i < defined.size(); i++) {
+                        if (defined.get(i).name.equals("$" + to_read.substring(0, end))) {
+                            isDefined = true;
+                            break;
+                        }
+                    }
+                    if (isDefined) {
                         matchAndProgress(terminal.DEFINED, expected, end + 1);
                     }
                     else {
@@ -359,7 +387,7 @@ public class SpecReader {
     }
 
     /**
-     * Check to see if the token provided by the characters in to_read matches the expected token
+     * Check to see if the token provided by the characters in to_read matches the expected token, and if it does then store it
      *
      * @param received :the token provided by the characters in to_read
      * @param expected :the token expected by the RegexParser
@@ -371,6 +399,12 @@ public class SpecReader {
         }
         else {
             to_read = to_read.substring(progress - 1);
+            if (!tokenTime) {
+                defined.get(defined.size() - 1).tokens.add(received);
+            }
+            else {
+                tokens.get(tokens.size() - 1).tokens.add(received);
+            }
         }
     }
 
