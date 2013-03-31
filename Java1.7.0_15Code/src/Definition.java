@@ -9,10 +9,10 @@ import java.util.ArrayList;
  */
 public class Definition {
     String name;
-    ArrayList<SpecReader.terminal> tokens;
+    ArrayList<TokenWithCharacters> tokens;
 
     public Definition(String name) {
         this.name = name;
-        tokens = new ArrayList<SpecReader.terminal>();
+        tokens = new ArrayList<TokenWithCharacters>();
     }
 }

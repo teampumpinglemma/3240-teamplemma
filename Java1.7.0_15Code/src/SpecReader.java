@@ -287,58 +287,58 @@ public class SpecReader {
                         }
                     }
                     if (isDefined) {
-                        matchAndProgress(terminal.DEFINED, expected, end + 1);
+                        matchAndProgress(terminal.DEFINED, expected, end + 1, c);
                     }
                     else {
-                        matchAndProgress(terminal.RE_CHAR, expected, 1);
+                        matchAndProgress(terminal.RE_CHAR, expected, 1, c);
                     }
                 }
                 else if (c == 'I') {
                     if (to_read.charAt(0) == 'N' && !(to_read.charAt(1) >= 'A' && to_read.charAt(1) <= 'Z') || (to_read.charAt(1) >= '0' && to_read.charAt(1) <= '9')) {
-                        matchAndProgress(terminal.IN, expected, 2);
+                        matchAndProgress(terminal.IN, expected, 2, c);
                     }
                     else {
-                        matchAndProgress(terminal.RE_CHAR, expected, 1);
+                        matchAndProgress(terminal.RE_CHAR, expected, 1, c);
                     }
                 }
                 else if (c >= ' ' && c <= '~' && c != ' ' && c != '\\' && c != '*' && c != '+' && c != '?' && c != '|' && c != '[' && c != ']' && c != '(' && c != ')' && c != '.'&& c != '\'' && c != '\"') {
-                    matchAndProgress(terminal.RE_CHAR, expected, 1);
+                    matchAndProgress(terminal.RE_CHAR, expected, 1, c);
                 }
                 else if (c == '\\') {
                     if (to_read.charAt(0) == ' ' || to_read.charAt(0) == '\\' || to_read.charAt(0) == '*' || to_read.charAt(0) == '+' || to_read.charAt(0) == '?' || to_read.charAt(0) == '|' || to_read.charAt(0) == '[' || to_read.charAt(0) == ']' || to_read.charAt(0) == '(' || to_read.charAt(0) == ')' || to_read.charAt(0) == '.' || to_read.charAt(0) == '\'' || to_read.charAt(0) == '\"') {
-                        matchAndProgress(terminal.RE_CHAR, expected, 2);
+                        matchAndProgress(terminal.RE_CHAR, expected, 2, c);
                     }
                     else {
                         throwError(null, expected);
                     }
                 }
                 else if (c == '*') {
-                    matchAndProgress(terminal.STAR, expected, 1);
+                    matchAndProgress(terminal.STAR, expected, 1, c);
                 }
                 else if (c == '+') {
-                    matchAndProgress(terminal.PLUS, expected, 1);
+                    matchAndProgress(terminal.PLUS, expected, 1, c);
                 }
                 else if (c == '?') {
                     throwError(null, expected);
                 }
                 else if (c == '|') {
-                    matchAndProgress(terminal.UNION, expected, 1);
+                    matchAndProgress(terminal.UNION, expected, 1, c);
                 }
                 else if (c == '[') {
-                    matchAndProgress(terminal.SQUARE_OPEN, expected, 1);
+                    matchAndProgress(terminal.SQUARE_OPEN, expected, 1, c);
                     inSquare = true;
                 }
                 else if (c == ']') {
-                    matchAndProgress(terminal.SQUARE_CLOSE, expected, 1);
+                    matchAndProgress(terminal.SQUARE_CLOSE, expected, 1, c);
                 }
                 else if (c == '(') {
-                    matchAndProgress(terminal.PAR_OPEN, expected, 1);
+                    matchAndProgress(terminal.PAR_OPEN, expected, 1, c);
                 }
                 else if (c == ')') {
-                    matchAndProgress(terminal.PAR_CLOSE, expected, 1);
+                    matchAndProgress(terminal.PAR_CLOSE, expected, 1, c);
                 }
                 else if (c == '.') {
-                    matchAndProgress(terminal.PERIOD, expected, 1);
+                    matchAndProgress(terminal.PERIOD, expected, 1, c);
                 }
                 else if (c == '\'') {
                     throwError(null, expected);
@@ -352,27 +352,27 @@ public class SpecReader {
             }
             else {
                 if (c >= ' ' && c <= '~' && c != '\\' && c != '^' && c != '-' && c != '[' && c != ']') {
-                    matchAndProgress(terminal.CLS_CHAR, expected, 1);
+                    matchAndProgress(terminal.CLS_CHAR, expected, 1, c);
                 }
                 else if (c == '\\') {
                     if (to_read.charAt(0) == '\\' || to_read.charAt(0) == '^' || to_read.charAt(0) == '-' || to_read.charAt(0) == '[' || to_read.charAt(0) == ']') {
-                        matchAndProgress(terminal.RE_CHAR, expected, 2);
+                        matchAndProgress(terminal.RE_CHAR, expected, 2, c);
                     }
                     else {
                         throwError(null);
                     }
                 }
                 else if (c == '^') {
-                    matchAndProgress(terminal.CARROT, expected, 1);
+                    matchAndProgress(terminal.CARROT, expected, 1, c);
                 }
                 else if (c == '-') {
-                    matchAndProgress(terminal.DASH, expected, 1);
+                    matchAndProgress(terminal.DASH, expected, 1, c);
                 }
                 else if (c == '[') {
-                    matchAndProgress(terminal.SQUARE_OPEN, expected, 1);
+                    matchAndProgress(terminal.SQUARE_OPEN, expected, 1, c);
                 }
                 else if (c == ']') {
-                    matchAndProgress(terminal.SQUARE_CLOSE, expected, 1);
+                    matchAndProgress(terminal.SQUARE_CLOSE, expected, 1, c);
                     inSquare = false;
                 }
                 else {
@@ -393,17 +393,18 @@ public class SpecReader {
      * @param expected :the token expected by the RegexParser
      * @param progress :how many characters to delete from to_read if the tokens match
      */
-    private void matchAndProgress(terminal received, terminal expected, int progress) {
+    private void matchAndProgress(terminal received, terminal expected, int progress, char c) {
         if (expected != received) {
             throwError(received, expected);
         }
         else {
+            String read = c + to_read.substring(0, progress - 1);
             to_read = to_read.substring(progress - 1);
             if (!tokenTime) {
-                defined.get(defined.size() - 1).tokens.add(received);
+                defined.get(defined.size() - 1).tokens.add(new TokenWithCharacters(received, read));
             }
             else {
-                tokens.get(tokens.size() - 1).tokens.add(received);
+                tokens.get(tokens.size() - 1).tokens.add(new TokenWithCharacters(received, read));
             }
         }
     }

@@ -23,7 +23,7 @@ public class Main {
             System.out.println(regexParser.specReader.defined.get(i).name);
             System.out.print("\t");
             for (int j = 0; j < regexParser.specReader.defined.get(i).tokens.size(); j++) {
-                System.out.print(regexParser.specReader.defined.get(i).tokens.get(j).toString() + "  ");
+                System.out.print(regexParser.specReader.defined.get(i).tokens.get(j).token.toString() + " " + regexParser.specReader.defined.get(i).tokens.get(j).characters + "   ");
             }
             System.out.println();
         }
@@ -32,7 +32,7 @@ public class Main {
             System.out.println(regexParser.specReader.tokens.get(i).name);
             System.out.print("\t");
             for (int j = 0; j < regexParser.specReader.tokens.get(i).tokens.size(); j++) {
-                System.out.print(regexParser.specReader.tokens.get(i).tokens.get(j).toString() + "  ");
+                System.out.print(regexParser.specReader.tokens.get(i).tokens.get(j).token.toString() + " " + regexParser.specReader.tokens.get(i).tokens.get(j).characters + "   ");
             }
             System.out.println();
         }
