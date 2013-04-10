@@ -7,14 +7,17 @@
  */
 public class Transition {
     CharacterClass transitionOn;
-    State nextState;
     boolean emptyString;
-    public Transition(CharacterClass characterClass, boolean emptyString) {
+    State currentState;
+    State nextState;
+    public Transition(State currentState, CharacterClass characterClass, boolean emptyString) {
+        this.currentState = currentState;
         this.transitionOn = characterClass;
         this.emptyString = emptyString;
-        this.nextState = new State(false);
+        this.nextState = new State();
     }
-    public Transition(CharacterClass characterClass, boolean emptyString, State nextState) {
+    public Transition(State currentState, CharacterClass characterClass, boolean emptyString, State nextState) {
+        this.currentState = currentState;
         this.transitionOn = characterClass;
         this.emptyString = emptyString;
         this.nextState = nextState;

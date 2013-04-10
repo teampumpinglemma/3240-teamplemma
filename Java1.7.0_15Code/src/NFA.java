@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Mickey
@@ -8,8 +10,10 @@
 public class NFA {
     State start;
     State accept;
+    ArrayList<Transition> transitions;
     public NFA() {
-        this.start = new State(true);
+        this.start = new State();
         this.accept = this.start;
+        this.transitions = new ArrayList<Transition>();
     }
 }

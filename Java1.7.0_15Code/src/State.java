@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-
 /**
  * Created with IntelliJ IDEA.
  * User: Mickey
@@ -8,10 +6,5 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class State {
-    ArrayList<Transition> transitionsFrom;
-    boolean isAccept;
-    public State(boolean isAccept) {
-        this.transitionsFrom = new ArrayList<Transition>();
-        this.isAccept = isAccept;
-    }
+
 }

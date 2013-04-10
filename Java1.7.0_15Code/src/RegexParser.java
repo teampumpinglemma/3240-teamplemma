@@ -155,13 +155,9 @@ public class RegexParser {
         }
         else if (token == SpecReader.terminal.RE_CHAR) {
             specReader.matchToken(token);
-            inProgressNFAs.push(new NFA());
-            inProgressNFAs.peek().start.isAccept = false;
             CharacterClass cc = new CharacterClass("");
             cc.setToTrue(specReader.tokens.get(specReader.tokens.size() - 1).tokens.get(specReader.tokens.get(specReader.tokens.size() - 1).tokens.size() - 1).characters.charAt(specReader.tokens.get(specReader.tokens.size() - 1).tokens.get(specReader.tokens.get(specReader.tokens.size() - 1).tokens.size() - 1).characters.length() - 1));
-            inProgressNFAs.peek().start.transitionsFrom.add(new Transition(cc, false));
-            inProgressNFAs.peek().start.transitionsFrom.get(0).nextState.isAccept = true;
-            inProgressNFAs.peek().accept = inProgressNFAs.peek().start.transitionsFrom.get(0).nextState;
+            inProgressNFAs.push(cc.createNFA());
             rexp2_tail();
             NFA after = inProgressNFAs.pop();
             NFA before = inProgressNFAs.pop();
@@ -206,13 +202,9 @@ public class RegexParser {
         SpecReader.terminal token = specReader.peekToken();
         if (token == SpecReader.terminal.PERIOD) {
             specReader.matchToken(token);
-            inProgressNFAs.push(new NFA());
-            inProgressNFAs.peek().start.isAccept = false;
             CharacterClass cc = new CharacterClass("");
             cc.setToTrue(' ', '~');
-            inProgressNFAs.peek().start.transitionsFrom.add(new Transition(cc, false));
-            inProgressNFAs.peek().start.transitionsFrom.get(0).nextState.isAccept = true;
-            inProgressNFAs.peek().accept = inProgressNFAs.peek().start.transitionsFrom.get(0).nextState;
+            inProgressNFAs.push(cc.createNFA());
             NFA after = inProgressNFAs.pop();
             NFA before = inProgressNFAs.pop();
             inProgressNFAs.push(concatNFAs(before, after));
@@ -230,7 +222,7 @@ public class RegexParser {
                     break;
                 }
             }
-            NFA after = charClassNFAs.get(i);
+            NFA after = characterClasses.get(i).createNFA();
             NFA before = inProgressNFAs.pop();
             inProgressNFAs.push(concatNFAs(before, after));
             System.out.println();
@@ -393,43 +385,59 @@ public class RegexParser {
         }
         charClassNFAs = new ArrayList<NFA>();
         for (int i = 0; i < characterClasses.size(); i++) {
-            charClassNFAs.add(new NFA());
-            charClassNFAs.get(i).start.isAccept = false;
-            charClassNFAs.get(i).start.transitionsFrom.add(new Transition(characterClasses.get(i), false));
-            charClassNFAs.get(i).start.transitionsFrom.get(0).nextState.isAccept = true;
-            charClassNFAs.get(i).accept = charClassNFAs.get(i).start.transitionsFrom.get(0).nextState;
+            charClassNFAs.add(characterClasses.get(i).createNFA());
         }
     }
 
     public NFA concatNFAs(NFA n1, NFA n2) {
-        n1.accept.isAccept = false;
-        n1.accept.transitionsFrom.add(new Transition(null, true, n2.start));
-        return n1;
+        NFA nfa = new NFA();
+        nfa.start = n1.start;
+        for (int i = 0; i < n1.transitions.size(); i++) {
+            nfa.transitions.add(n1.transitions.get(i));
+        }
+        nfa.transitions.add(new Transition(n1.accept, null, true, n2.start));
+        for (int i = 0; i < n2.transitions.size(); i++) {
+            nfa.transitions.add(n2.transitions.get(i));
+        }
+        nfa.accept = n2.accept;
+        return nfa;
     }
 
     public NFA unionNFAs(NFA n1, NFA n2) {
         NFA nfa = new NFA();
-        nfa.start.isAccept = false;
-        nfa.start.transitionsFrom.add(new Transition(null, true, n1.start));
-        nfa.start.transitionsFrom.add(new Transition(null, true, n2.start));
-        nfa.accept = new State(true);
-        n1.accept.isAccept = false;
-        n1.accept.transitionsFrom.add(new Transition(null, true, nfa.accept));
-        n2.accept.isAccept = false;
-        n2.accept.transitionsFrom.add(new Transition(null, true, nfa.accept));
+        nfa.transitions.add(new Transition(nfa.start, null, true, n1.start));
+        nfa.transitions.add(new Transition(nfa.start, null, true, n2.start));
+        for (int i = 0; i < n1.transitions.size(); i++) {
+            nfa.transitions.add(n1.transitions.get(i));
+        }
+        for (int i = 0; i < n2.transitions.size(); i++) {
+            nfa.transitions.add(n2.transitions.get(i));
+        }
+        nfa.accept = new State();
+        nfa.transitions.add(new Transition(n1.accept, null, true, nfa.accept));
+        nfa.transitions.add(new Transition(n2.accept, null, true, nfa.accept));
         return nfa;
     }
 
     public NFA starNFA(NFA n1) {
-        n1.accept.isAccept = false;
-        n1.accept.transitionsFrom.add(new Transition(null, true, n1.start));
-        n1.accept = n1.start;
-        n1.accept.isAccept = true;
-        return n1;
+        NFA nfa = new NFA();
+        nfa.start = n1.start;
+        for (int i = 0; i < n1.transitions.size(); i++) {
+            nfa.transitions.add(n1.transitions.get(i));
+        }
+        nfa.transitions.add(new Transition(n1.accept, null, true, nfa.start));
+        nfa.accept = nfa.start;
+        return nfa;
     }
 
     public NFA plusNFA(NFA n1) {
-        n1.accept.transitionsFrom.add(new Transition(null, true, n1.start));
-        return n1;
+        NFA nfa = new NFA();
+        nfa.start = n1.start;
+        for (int i = 0; i < n1.transitions.size(); i++) {
+            nfa.transitions.add(n1.transitions.get(i));
+        }
+        nfa.transitions.add(new Transition(n1.accept, null, true, nfa.start));
+        nfa.accept = n1.accept;
+        return nfa;
     }
 }

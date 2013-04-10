@@ -52,4 +52,11 @@ public class CharacterClass {
             }
         }
     }
+
+    public NFA createNFA() {
+        NFA nfa = new NFA();
+        nfa.transitions.add(new Transition(nfa.start, this, false));
+        nfa.accept = nfa.transitions.get(0).nextState;
+        return nfa;
+    }
 }
