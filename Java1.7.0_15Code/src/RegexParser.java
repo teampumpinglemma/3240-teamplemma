@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * The RegexParser class parses the regex on each line of the Spec file by
@@ -20,6 +22,10 @@ public class RegexParser {
     BufferedReader br;
     // just for checking if there are still lines in the Spec file
     BufferedReader checker;
+    ArrayList<CharacterClass> characterClasses;
+    ArrayList<NFA> charClassNFAs;
+    ArrayList<NFA> tokenNFAs;
+    Stack<NFA> inProgressNFAs;
 
     /**
      * Constructor creates two BufferedReaders for the same Spec file,
@@ -42,19 +48,40 @@ public class RegexParser {
     /**
      * Parses the entire Spec file
      */
-    public void parse() {
+    public void parseCharClasses() {
         try {
-            // while not at the end of the Spec file
-            while (checker.readLine() != null) {
-                // if the line can be split up into a class and a corresponding regex
-                if (specReader.set_up_new_line()) {
-                    // parse through the regex using a recursive descent parser
-                    reg_ex();
-                    // if the recursive descent parser finishes, then make sure the entire regex has been parsed, otherwise throw an error
-                    specReader.matchToken(SpecReader.terminal.END);
-                    // if the recursive descent parser finishes and the entire regex has been parsed, then the parse for that line was successful
-                    // System.out.println("Parse successful!");
-                }
+            // while still on char classes
+            while (specReader.set_up_new_line()) {
+                checker.readLine();
+                // parse through the regex using a recursive descent parser
+                reg_ex(false);
+                // if the recursive descent parser finishes, then make sure the entire regex has been parsed, otherwise throw an error
+                specReader.matchToken(SpecReader.terminal.END);
+                // if the recursive descent parser finishes and the entire regex has been parsed, then the parse for that line was successful
+                // System.out.println("Parse successful!");
+            }
+            checker.readLine();
+        }
+        catch (Exception E) {
+            System.out.println("readLine error");
+            System.exit(0);
+        }
+        buildCharClassNFAs();
+    }
+
+    public void parseTokens() {
+        try {
+            tokenNFAs = new ArrayList<NFA>();
+            String l = checker.readLine();
+            while (l != null) {
+                specReader.set_up_new_line();
+                // parse through the regex using a recursive descent parser
+                reg_ex(true);
+                // if the recursive descent parser finishes, then make sure the entire regex has been parsed, otherwise throw an error
+                specReader.matchToken(SpecReader.terminal.END);
+                // if the recursive descent parser finishes and the entire regex has been parsed, then the parse for that line was successful
+                // System.out.println("Parse successful!");
+                l = checker.readLine();
             }
         }
         catch (Exception E) {
@@ -66,8 +93,13 @@ public class RegexParser {
     /**
      * The root of the recursive descent parser
      */
-    private void reg_ex() {
+    private void reg_ex(boolean tokenTime) {
+        inProgressNFAs = new Stack<NFA>();
+        inProgressNFAs.push(new NFA());
         rexp();
+        if (tokenTime) {
+            tokenNFAs.add(inProgressNFAs.pop());
+        }
     }
 
     private void rexp() {
@@ -79,8 +111,13 @@ public class RegexParser {
         SpecReader.terminal token = specReader.peekToken();
         if (token == SpecReader.terminal.UNION) {
             specReader.matchToken(token);
+            inProgressNFAs.push(new NFA());
             rexp1();
             rexp_prime();
+            NFA after = inProgressNFAs.pop();
+            NFA before = inProgressNFAs.pop();
+            inProgressNFAs.push(unionNFAs(before, after));
+            System.out.println();
         }
         else {
             return;
@@ -107,13 +144,29 @@ public class RegexParser {
         SpecReader.terminal token = specReader.peekToken();
         if (token == SpecReader.terminal.PAR_OPEN) {
             specReader.matchToken(token);
+            inProgressNFAs.push(new NFA());
             rexp();
             specReader.matchToken(SpecReader.terminal.PAR_CLOSE);
             rexp2_tail();
+            NFA after = inProgressNFAs.pop();
+            NFA before = inProgressNFAs.pop();
+            inProgressNFAs.push(concatNFAs(before, after));
+            System.out.println();
         }
         else if (token == SpecReader.terminal.RE_CHAR) {
             specReader.matchToken(token);
+            inProgressNFAs.push(new NFA());
+            inProgressNFAs.peek().start.isAccept = false;
+            CharacterClass cc = new CharacterClass("");
+            cc.setToTrue(specReader.tokens.get(specReader.tokens.size() - 1).tokens.get(specReader.tokens.get(specReader.tokens.size() - 1).tokens.size() - 1).characters.charAt(specReader.tokens.get(specReader.tokens.size() - 1).tokens.get(specReader.tokens.get(specReader.tokens.size() - 1).tokens.size() - 1).characters.length() - 1));
+            inProgressNFAs.peek().start.transitionsFrom.add(new Transition(cc, false));
+            inProgressNFAs.peek().start.transitionsFrom.get(0).nextState.isAccept = true;
+            inProgressNFAs.peek().accept = inProgressNFAs.peek().start.transitionsFrom.get(0).nextState;
             rexp2_tail();
+            NFA after = inProgressNFAs.pop();
+            NFA before = inProgressNFAs.pop();
+            inProgressNFAs.push(concatNFAs(before, after));
+            System.out.println();
         }
         else {
             rexp3();
@@ -124,9 +177,15 @@ public class RegexParser {
         SpecReader.terminal token = specReader.peekToken();
         if (token == SpecReader.terminal.STAR) {
             specReader.matchToken(token);
+            NFA before = inProgressNFAs.pop();
+            inProgressNFAs.push(starNFA(before));
+            System.out.println();
         }
         else if (token == SpecReader.terminal.PLUS) {
             specReader.matchToken(token);
+            NFA before = inProgressNFAs.pop();
+            inProgressNFAs.push(plusNFA(before));
+            System.out.println();
         }
         else {
             return;
@@ -147,6 +206,17 @@ public class RegexParser {
         SpecReader.terminal token = specReader.peekToken();
         if (token == SpecReader.terminal.PERIOD) {
             specReader.matchToken(token);
+            inProgressNFAs.push(new NFA());
+            inProgressNFAs.peek().start.isAccept = false;
+            CharacterClass cc = new CharacterClass("");
+            cc.setToTrue(' ', '~');
+            inProgressNFAs.peek().start.transitionsFrom.add(new Transition(cc, false));
+            inProgressNFAs.peek().start.transitionsFrom.get(0).nextState.isAccept = true;
+            inProgressNFAs.peek().accept = inProgressNFAs.peek().start.transitionsFrom.get(0).nextState;
+            NFA after = inProgressNFAs.pop();
+            NFA before = inProgressNFAs.pop();
+            inProgressNFAs.push(concatNFAs(before, after));
+            System.out.println();
         }
         else if (token == SpecReader.terminal.SQUARE_OPEN) {
             specReader.matchToken(token);
@@ -154,6 +224,16 @@ public class RegexParser {
         }
         else if (token == SpecReader.terminal.DEFINED) {
             specReader.matchToken(token);
+            int i = 0;
+            for (i = 0; i < specReader.defined.size(); i++) {
+                if (specReader.tokens.get(specReader.tokens.size() - 1).tokens.get(specReader.tokens.get(specReader.tokens.size() - 1).tokens.size() - 1).characters.equals(specReader.defined.get(i).name)) {
+                    break;
+                }
+            }
+            NFA after = charClassNFAs.get(i);
+            NFA before = inProgressNFAs.pop();
+            inProgressNFAs.push(concatNFAs(before, after));
+            System.out.println();
         }
         else {
             specReader.throwError(token, SpecReader.terminal.PERIOD, SpecReader.terminal.SQUARE_OPEN, SpecReader.terminal.DEFINED);
@@ -224,5 +304,132 @@ public class RegexParser {
         else {
             specReader.throwError(token, SpecReader.terminal.SQUARE_OPEN, SpecReader.terminal.DEFINED);
         }
+    }
+
+    public void buildCharClassNFAs() {
+        // Stores the built character classes
+        characterClasses = new ArrayList<CharacterClass>();
+        // For every character class that was parsed earlier
+        for (int i = 0; i < specReader.defined.size(); i++) {
+            Definition definition = specReader.defined.get(i);
+            // Set up a new character class
+            characterClasses.add(new CharacterClass(definition.name));
+            // All character classes should start with a SQUARE_OPEN
+            if (definition.tokens.get(0).token == SpecReader.terminal.SQUARE_OPEN) {
+                // If it's an exclude set
+                if (definition.tokens.get(1).token == SpecReader.terminal.CARROT) {
+                    CharacterClass not = new CharacterClass("");
+                    // The current token (starting with the one after the carrot)
+                    int j = 2;
+                    // While still inside square brackets
+                    while (definition.tokens.get(j).token != SpecReader.terminal.SQUARE_CLOSE) {
+                        // If the next token is a dash, then a range of characters is being defined
+                        if (definition.tokens.get(j + 1).token == SpecReader.terminal.DASH) {
+                            not.setToTrue(definition.tokens.get(j).characters.charAt(definition.tokens.get(j).characters.length()- 1), definition.tokens.get(j + 2).characters.charAt(definition.tokens.get(j + 2).characters.length() - 1));
+                            j += 3;
+                        }
+                        // Else a single character is being defined
+                        else {
+                            not.setToTrue(definition.tokens.get(j).characters.charAt(definition.tokens.get(j).characters.length() - 1));
+                            j += 1;
+                        }
+                    }
+                    j += 2;
+                    CharacterClass in = null;
+                    // If the character class following the IN token is a previously defined character class
+                    if (definition.tokens.get(j).token == SpecReader.terminal.DEFINED) {
+                        // Find which one it is
+                        for (int k = 0; k < characterClasses.size() - 1; k++) {
+                            if (characterClasses.get(k).name.equals(definition.tokens.get(j).characters)) {
+                                in = characterClasses.get(k);
+                                break;
+                            }
+                        }
+                    }
+                    // Else it's a another set of square brackets
+                    else {
+                        in = new CharacterClass("");
+                        j += 1;
+                        // While still inside square brackets
+                        while (definition.tokens.get(j).token != SpecReader.terminal.SQUARE_CLOSE) {
+                            // If the next token is a dash, then a range of characters is being defined
+                            if (definition.tokens.get(j + 1).token == SpecReader.terminal.DASH) {
+                                in.setToTrue(definition.tokens.get(j).characters.charAt(definition.tokens.get(j).characters.length()- 1), definition.tokens.get(j + 2).characters.charAt(definition.tokens.get(j + 2).characters.length() - 1));
+                                j += 3;
+                            }
+                            // Else a single character is being defined
+                            else {
+                                in.setToTrue(definition.tokens.get(j).characters.charAt(definition.tokens.get(j).characters.length() - 1));
+                                j += 1;
+                            }
+                        }
+                    }
+                    characterClasses.get(i).notBlankInBlank(not, in);
+                }
+                // Else it's a normal set of square brackets with characters to include
+                else {
+                    // The current token (starting with the one after the SQUARE_OPEN)
+                    int j = 1;
+                    // While still inside square brackets
+                    while (definition.tokens.get(j).token != SpecReader.terminal.SQUARE_CLOSE) {
+                        // If the next token is a dash, then a range of characters is being defined
+                        if (definition.tokens.get(j + 1).token == SpecReader.terminal.DASH) {
+                            characterClasses.get(i).setToTrue(definition.tokens.get(j).characters.charAt(definition.tokens.get(j).characters.length()- 1), definition.tokens.get(j + 2).characters.charAt(definition.tokens.get(j + 2).characters.length() - 1));
+                            j += 3;
+                        }
+                        // Else a single character is being defined
+                        else {
+                            characterClasses.get(i).setToTrue(definition.tokens.get(j).characters.charAt(definition.tokens.get(j).characters.length() - 1));
+                            j += 1;
+                        }
+                    }
+                }
+            }
+            // Else throw an error
+            else {
+                System.out.println("Not a defined class");
+                System.exit(0);
+            }
+        }
+        charClassNFAs = new ArrayList<NFA>();
+        for (int i = 0; i < characterClasses.size(); i++) {
+            charClassNFAs.add(new NFA());
+            charClassNFAs.get(i).start.isAccept = false;
+            charClassNFAs.get(i).start.transitionsFrom.add(new Transition(characterClasses.get(i), false));
+            charClassNFAs.get(i).start.transitionsFrom.get(0).nextState.isAccept = true;
+            charClassNFAs.get(i).accept = charClassNFAs.get(i).start.transitionsFrom.get(0).nextState;
+        }
+    }
+
+    public NFA concatNFAs(NFA n1, NFA n2) {
+        n1.accept.isAccept = false;
+        n1.accept.transitionsFrom.add(new Transition(null, true, n2.start));
+        return n1;
+    }
+
+    public NFA unionNFAs(NFA n1, NFA n2) {
+        NFA nfa = new NFA();
+        nfa.start.isAccept = false;
+        nfa.start.transitionsFrom.add(new Transition(null, true, n1.start));
+        nfa.start.transitionsFrom.add(new Transition(null, true, n2.start));
+        nfa.accept = new State(true);
+        n1.accept.isAccept = false;
+        n1.accept.transitionsFrom.add(new Transition(null, true, nfa.accept));
+        n2.accept.isAccept = false;
+        n2.accept.transitionsFrom.add(new Transition(null, true, nfa.accept));
+        return nfa;
+    }
+
+    public NFA starNFA(NFA n1) {
+        n1.accept.isAccept = false;
+        n1.accept.transitionsFrom.add(new Transition(null, true, n1.start));
+        n1.accept = n1.start;
+        n1.accept.isAccept = true;
+        return n1;
+    }
+
+    public NFA plusNFA(NFA n1) {
+        n1.accept.transitionsFrom.add(new Transition(null, true, n1.start));
+        return n1;
     }
 }
