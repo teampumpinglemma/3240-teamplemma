@@ -10,9 +10,9 @@ import java.util.LinkedList;
  */
 public class DFATable {
     ArrayList<DFATableRow> tableRows;
-    NFA nfa;
+    GiantNFA nfa;
 
-    public DFATable(NFA nfa) {
+    public DFATable(GiantNFA nfa) {
         tableRows = new ArrayList<DFATableRow>();
         this.nfa = nfa;
         ArrayList<State> start = new ArrayList<State>();

@@ -19,7 +19,7 @@ public class Main {
         RegexParser regexParser = new RegexParser(new File(args[0]));
         regexParser.parseCharClasses();
         regexParser.parseTokens();
-        regexParser.buildDFATables();
+        regexParser.buildDFATable();
 
         System.out.println("Char Classes");
         for (int i = 0; i < regexParser.specReader.defined.size(); i++) {
@@ -47,6 +47,20 @@ public class Main {
             for (int j = 0; j < accepted.length; j++) {
                 if (accepted[j]) {
                     System.out.print(" " + (char)(j + 32));
+                }
+            }
+            System.out.println();
+        }
+        System.out.println("\nDFA Table");
+        for (int i = 0; i < regexParser.dfaTable.tableRows.size(); i++) {
+            System.out.println(i);
+            for (int j = 0; j < regexParser.dfaTable.tableRows.get(i).nfaStates.size(); j++) {
+                System.out.print(regexParser.dfaTable.tableRows.get(i).nfaStates.get(j).toString() + " ");
+            }
+            System.out.println();
+            for (int j = 0; j < 95; j++) {
+                if (regexParser.dfaTable.tableRows.get(i).nextStates[j] != 1) {
+                    System.out.print("   " + (char)(j + 32) + " " + regexParser.dfaTable.tableRows.get(i).nextStates[j]);
                 }
             }
             System.out.println();
