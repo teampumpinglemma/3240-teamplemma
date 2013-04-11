@@ -83,7 +83,7 @@ public class DFATable {
         ArrayList<State> toReturn = new ArrayList<State>();
         for (int i = 0; i < inputStates.size(); i++) {
             for (int j = 0; j < nfa.transitions.size(); j++) {
-                if (nfa.transitions.get(j).currentState.equals(inputStates.get(i)) && nfa.transitions.get(j).transitionOn.accepted[character - 32] && !toReturn.contains(nfa.transitions.get(j).nextState)) {
+                if (nfa.transitions.get(j).currentState.equals(inputStates.get(i)) && (nfa.transitions.get(j).transitionOn != null) && nfa.transitions.get(j).transitionOn.accepted[character] && !toReturn.contains(nfa.transitions.get(j).nextState)) {
                     toReturn.add(nfa.transitions.get(j).nextState);
                 }
             }
