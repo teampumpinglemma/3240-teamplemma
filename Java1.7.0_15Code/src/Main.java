@@ -65,5 +65,13 @@ public class Main {
             }
             System.out.println();
         }
+        System.out.println("Accept");
+        for (int j = 0; j < regexParser.dfaTable.tableRows.size(); j++) {
+            for (int i = 0; i < regexParser.dfaTable.nfa.acceptStates.size(); i++) {
+                if (regexParser.dfaTable.tableRows.get(j).nfaStates.contains(regexParser.dfaTable.nfa.acceptStates.get(i))) {
+                    System.out.print(" " + j);
+                }
+            }
+        }
     }
 }

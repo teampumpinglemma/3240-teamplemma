@@ -95,7 +95,6 @@ public class RegexParser {
     public void buildDFATable() {
         GiantNFA giantNFA = new GiantNFA(tokenNFAs);
         dfaTable = new DFATable(giantNFA);
-        System.out.println();
     }
 
     /**
