@@ -56,6 +56,7 @@ public class CharacterClass {
     public NFA createNFA() {
         NFA nfa = new NFA();
         nfa.transitions.add(new Transition(nfa.start, this, false));
+        nfa.states.add(nfa.transitions.get(0).nextState);
         nfa.accept = nfa.transitions.get(0).nextState;
         return nfa;
     }

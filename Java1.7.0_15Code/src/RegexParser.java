@@ -391,13 +391,20 @@ public class RegexParser {
 
     public NFA concatNFAs(NFA n1, NFA n2) {
         NFA nfa = new NFA();
+        nfa.states.remove(0);
         nfa.start = n1.start;
         for (int i = 0; i < n1.transitions.size(); i++) {
             nfa.transitions.add(n1.transitions.get(i));
         }
+        for (int i = 0; i < n1.states.size(); i++) {
+            nfa.states.add(n1.states.get(i));
+        }
         nfa.transitions.add(new Transition(n1.accept, null, true, n2.start));
         for (int i = 0; i < n2.transitions.size(); i++) {
             nfa.transitions.add(n2.transitions.get(i));
+        }
+        for (int i = 0; i < n2.states.size(); i++) {
+            nfa.states.add(n2.states.get(i));
         }
         nfa.accept = n2.accept;
         return nfa;
@@ -410,10 +417,17 @@ public class RegexParser {
         for (int i = 0; i < n1.transitions.size(); i++) {
             nfa.transitions.add(n1.transitions.get(i));
         }
+        for (int i = 0; i < n1.states.size(); i++) {
+            nfa.states.add(n1.states.get(i));
+        }
         for (int i = 0; i < n2.transitions.size(); i++) {
             nfa.transitions.add(n2.transitions.get(i));
         }
+        for (int i = 0; i < n2.states.size(); i++) {
+            nfa.states.add(n2.states.get(i));
+        }
         nfa.accept = new State();
+        nfa.states.add(nfa.accept);
         nfa.transitions.add(new Transition(n1.accept, null, true, nfa.accept));
         nfa.transitions.add(new Transition(n2.accept, null, true, nfa.accept));
         return nfa;
@@ -421,9 +435,13 @@ public class RegexParser {
 
     public NFA starNFA(NFA n1) {
         NFA nfa = new NFA();
+        nfa.states.remove(0);
         nfa.start = n1.start;
         for (int i = 0; i < n1.transitions.size(); i++) {
             nfa.transitions.add(n1.transitions.get(i));
+        }
+        for (int i = 0; i < n1.states.size(); i++) {
+            nfa.states.add(n1.states.get(i));
         }
         nfa.transitions.add(new Transition(n1.accept, null, true, nfa.start));
         nfa.accept = nfa.start;
@@ -432,9 +450,13 @@ public class RegexParser {
 
     public NFA plusNFA(NFA n1) {
         NFA nfa = new NFA();
+        nfa.states.remove(0);
         nfa.start = n1.start;
         for (int i = 0; i < n1.transitions.size(); i++) {
             nfa.transitions.add(n1.transitions.get(i));
+        }
+        for (int i = 0; i < n1.states.size(); i++) {
+            nfa.states.add(n1.states.get(i));
         }
         nfa.transitions.add(new Transition(n1.accept, null, true, nfa.start));
         nfa.accept = n1.accept;

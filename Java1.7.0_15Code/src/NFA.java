@@ -10,10 +10,13 @@ import java.util.ArrayList;
 public class NFA {
     State start;
     State accept;
+    ArrayList<State> states;
     ArrayList<Transition> transitions;
     public NFA() {
         this.start = new State();
         this.accept = this.start;
+        this.states = new ArrayList<State>();
+        this.states.add(this.start);
         this.transitions = new ArrayList<Transition>();
     }
 }
