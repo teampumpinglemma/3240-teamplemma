@@ -19,6 +19,7 @@ public class Main {
         RegexParser regexParser = new RegexParser(new File(args[0]));
         regexParser.parseCharClasses();
         regexParser.parseTokens();
+        regexParser.buildDFATables();
 
         System.out.println("Char Classes");
         for (int i = 0; i < regexParser.specReader.defined.size(); i++) {

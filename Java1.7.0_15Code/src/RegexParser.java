@@ -26,6 +26,7 @@ public class RegexParser {
     ArrayList<NFA> charClassNFAs;
     ArrayList<NFA> tokenNFAs;
     Stack<NFA> inProgressNFAs;
+    ArrayList<DFATable> dfaTables;
 
     /**
      * Constructor creates two BufferedReaders for the same Spec file,
@@ -88,6 +89,14 @@ public class RegexParser {
             System.out.println("readLine error");
             System.exit(0);
         }
+    }
+
+    public void buildDFATables() {
+        dfaTables = new ArrayList<DFATable>();
+        for (int i = 0; i < tokenNFAs.size(); i++) {
+            dfaTables.add(new DFATable(tokenNFAs.get(i)));
+        }
+        System.out.println();
     }
 
     /**
