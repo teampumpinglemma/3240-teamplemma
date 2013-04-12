@@ -20,7 +20,9 @@ public class Main {
         regexParser.parseCharClasses();
         regexParser.parseTokens();
         regexParser.buildDFATable();
-
+        new TableWalker(regexParser.dfaTable, new File(args[1]), new File(args[2]));
+        System.out.println("Success! Check your output file!");
+        /*
         System.out.println("Char Classes");
         for (int i = 0; i < regexParser.specReader.defined.size(); i++) {
             System.out.println(regexParser.specReader.defined.get(i).name);
@@ -73,7 +75,6 @@ public class Main {
                 }
             }
         }
-        System.out.println("\n\nOutput");
-        new TableWalker(regexParser.dfaTable, new File(args[1]));
+        */
     }
 }
