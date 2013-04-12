@@ -11,10 +11,13 @@ import java.util.LinkedList;
 public class DFATable {
     ArrayList<DFATableRow> tableRows;
     GiantNFA nfa;
+    DFATableRow currentDFAState;
+    ArrayList<Definition> tokens;
 
-    public DFATable(GiantNFA nfa) {
+    public DFATable(GiantNFA nfa, ArrayList<Definition> tokens) {
         tableRows = new ArrayList<DFATableRow>();
         this.nfa = nfa;
+        this.tokens = tokens;
         ArrayList<State> start = new ArrayList<State>();
         start.add(nfa.start);
         tableRows.add(new DFATableRow(eClosure(start)));
@@ -57,10 +60,24 @@ public class DFATable {
                 }
             }
         }
-        //TODO accept states
+        currentDFAState = tableRows.get(0);
     }
 
-    public ArrayList<State> eClosure(ArrayList<State> inputStates) {
+    public void progress(int character) {
+        currentDFAState = tableRows.get(currentDFAState.nextStates[character - 32]);
+    }
+
+    public Definition tryAccept() {
+        for (int i = 0; i < currentDFAState.nfaStates.size(); i++) {
+            int j = nfa.acceptStates.indexOf(currentDFAState.nfaStates.get(i));
+            if (j != -1) {
+                return tokens.get(j);
+            }
+        }
+        return null;
+    }
+
+    private ArrayList<State> eClosure(ArrayList<State> inputStates) {
         ArrayList<State> eClosure = new ArrayList<State>();
         LinkedList<State> investigate = new LinkedList<State>();
         for (int i = 0; i < inputStates.size(); i++) {
@@ -79,7 +96,7 @@ public class DFATable {
         return eClosure;
     }
 
-    public ArrayList<State> move(ArrayList<State> inputStates, int character) {
+    private ArrayList<State> move(ArrayList<State> inputStates, int character) {
         ArrayList<State> toReturn = new ArrayList<State>();
         for (int i = 0; i < inputStates.size(); i++) {
             for (int j = 0; j < nfa.transitions.size(); j++) {
@@ -90,4 +107,6 @@ public class DFATable {
         }
         return toReturn;
     }
+
+
 }

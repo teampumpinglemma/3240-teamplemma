@@ -94,7 +94,7 @@ public class RegexParser {
 
     public void buildDFATable() {
         GiantNFA giantNFA = new GiantNFA(tokenNFAs);
-        dfaTable = new DFATable(giantNFA);
+        dfaTable = new DFATable(giantNFA, specReader.tokens);
     }
 
     /**
@@ -124,7 +124,6 @@ public class RegexParser {
             NFA after = inProgressNFAs.pop();
             NFA before = inProgressNFAs.pop();
             inProgressNFAs.push(unionNFAs(before, after));
-            System.out.println();
         }
         else {
             return;
@@ -158,7 +157,6 @@ public class RegexParser {
             NFA after = inProgressNFAs.pop();
             NFA before = inProgressNFAs.pop();
             inProgressNFAs.push(concatNFAs(before, after));
-            System.out.println();
         }
         else if (token == SpecReader.terminal.RE_CHAR) {
             specReader.matchToken(token);
@@ -169,7 +167,6 @@ public class RegexParser {
             NFA after = inProgressNFAs.pop();
             NFA before = inProgressNFAs.pop();
             inProgressNFAs.push(concatNFAs(before, after));
-            System.out.println();
         }
         else {
             rexp3();
@@ -182,13 +179,11 @@ public class RegexParser {
             specReader.matchToken(token);
             NFA before = inProgressNFAs.pop();
             inProgressNFAs.push(starNFA(before));
-            System.out.println();
         }
         else if (token == SpecReader.terminal.PLUS) {
             specReader.matchToken(token);
             NFA before = inProgressNFAs.pop();
             inProgressNFAs.push(plusNFA(before));
-            System.out.println();
         }
         else {
             return;
@@ -215,7 +210,6 @@ public class RegexParser {
             NFA after = inProgressNFAs.pop();
             NFA before = inProgressNFAs.pop();
             inProgressNFAs.push(concatNFAs(before, after));
-            System.out.println();
         }
         else if (token == SpecReader.terminal.SQUARE_OPEN) {
             specReader.matchToken(token);
@@ -232,7 +226,6 @@ public class RegexParser {
             NFA after = characterClasses.get(i).createNFA();
             NFA before = inProgressNFAs.pop();
             inProgressNFAs.push(concatNFAs(before, after));
-            System.out.println();
         }
         else {
             specReader.throwError(token, SpecReader.terminal.PERIOD, SpecReader.terminal.SQUARE_OPEN, SpecReader.terminal.DEFINED);

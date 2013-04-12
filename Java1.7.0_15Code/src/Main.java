@@ -73,5 +73,7 @@ public class Main {
                 }
             }
         }
+        System.out.println("\n\nOutput");
+        new TableWalker(regexParser.dfaTable, new File(args[1]));
     }
 }
