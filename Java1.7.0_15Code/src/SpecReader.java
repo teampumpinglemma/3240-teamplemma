@@ -120,7 +120,7 @@ public class SpecReader {
                 if (c == '$') {
                     int end = 0;
                     // keep reading characters until finding one that is not a capital letter or number
-                    while (end < to_read.length() && ((to_read.charAt(end) >= 'A' && to_read.charAt(end) <= 'Z') || (to_read.charAt(end) >= '0' && to_read.charAt(end) <= '9'))) {
+                    while (end < to_read.length() && (to_read.charAt(end) >= ' ' && to_read.charAt(end) <= '~' && to_read.charAt(end) != ' ' && to_read.charAt(end) != '\\' && to_read.charAt(end) != '*' && to_read.charAt(end) != '+' && to_read.charAt(end) != '?' && to_read.charAt(end) != '|' && to_read.charAt(end) != '[' && to_read.charAt(end) != ']' && to_read.charAt(end) != '(' && to_read.charAt(end) != ')' && to_read.charAt(end) != '.'&& to_read.charAt(end) != '\'' && to_read.charAt(end) != '\"')) {
                         end++;
                     }
                     // check if those characters form a defined class
@@ -276,7 +276,7 @@ public class SpecReader {
                 }
                 if (c == '$') {
                     int end = 0;
-                    while (end < to_read.length() && ((to_read.charAt(end) >= 'A' && to_read.charAt(end) <= 'Z') || (to_read.charAt(end) >= '0' && to_read.charAt(end) <= '9'))) {
+                    while (end < to_read.length() && (to_read.charAt(end) >= ' ' && to_read.charAt(end) <= '~' && to_read.charAt(end) != ' ' && to_read.charAt(end) != '\\' && to_read.charAt(end) != '*' && to_read.charAt(end) != '+' && to_read.charAt(end) != '?' && to_read.charAt(end) != '|' && to_read.charAt(end) != '[' && to_read.charAt(end) != ']' && to_read.charAt(end) != '(' && to_read.charAt(end) != ')' && to_read.charAt(end) != '.'&& to_read.charAt(end) != '\'' && to_read.charAt(end) != '\"')) {
                         end++;
                     }
                     boolean isDefined = false;
