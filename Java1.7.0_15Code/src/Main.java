@@ -11,9 +11,9 @@ import java.io.File;
  */
 public class Main {
     /**
-     * The main method... creates a RegexParser, and then parses the Spec file, and then builds the character classes
+     * The main method... creates a RegexParser, then parses and builds the NFAs for the Character Classes, then parses and builds the NFAs for the Tokens, then combines the Token NFAs and builds the DFA Table, and then finally scans the input file for tokens and writes them to the output file
      *
-     * @param args :pass in the Spec file... to do this in IntelliJ, go to Run -> Edit Configurations... and then put the path to the file in "Program arguments"
+     * @param args :args[0] pass in the absolute path to the Spec file, args[1] pass in the absolute path to the Input file, args[2] pass in the absolute path to the Output file (file does not have to exist yet)
      */
     public static void main(String[] args) {
         RegexParser regexParser = new RegexParser(new File(args[0]));

@@ -49,7 +49,7 @@ public class SpecReader {
     /**
      * Attempts to divide up new line into class name and regex
      *
-     * @return :is the line not empty? if the line is empty, then RegexParser skips it
+     * @return :is the line not empty? if the line is empty, this signifies the switch from Char Classes to Tokens
      */
     public boolean set_up_new_line() {
         try {
@@ -119,7 +119,7 @@ public class SpecReader {
                 // if c is a dollar-sign
                 if (c == '$') {
                     int end = 0;
-                    // keep reading characters until finding one that is not a capital letter or number
+                    // keep reading characters until finding one that is not a special character
                     while (end < to_read.length() && (to_read.charAt(end) >= ' ' && to_read.charAt(end) <= '~' && to_read.charAt(end) != ' ' && to_read.charAt(end) != '\\' && to_read.charAt(end) != '*' && to_read.charAt(end) != '+' && to_read.charAt(end) != '?' && to_read.charAt(end) != '|' && to_read.charAt(end) != '[' && to_read.charAt(end) != ']' && to_read.charAt(end) != '(' && to_read.charAt(end) != ')' && to_read.charAt(end) != '.'&& to_read.charAt(end) != '\'' && to_read.charAt(end) != '\"')) {
                         end++;
                     }

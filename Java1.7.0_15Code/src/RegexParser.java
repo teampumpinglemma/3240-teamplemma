@@ -9,6 +9,7 @@ import java.util.Stack;
  * 1. feeding that line to a SpecReader and then
  * 2. parsing the regex using a recursive descent parser which
  * 3. requests tokens from the SpecReader to decide how to parse
+ * Also has methods for building the NFAs and building the DFA Table
  *
  * Created with IntelliJ IDEA.
  * User: Mickey
@@ -25,6 +26,7 @@ public class RegexParser {
     ArrayList<CharacterClass> characterClasses;
     ArrayList<NFA> charClassNFAs;
     ArrayList<NFA> tokenNFAs;
+    // partials of a token NFA that is still being parsed
     Stack<NFA> inProgressNFAs;
     DFATable dfaTable;
 
@@ -48,7 +50,7 @@ public class RegexParser {
     }
 
     /**
-     * Parses the entire Spec file
+     * Parses the entire CharClass portion of the Spec file
      */
     public void parseCharClasses() {
         try {
@@ -59,8 +61,6 @@ public class RegexParser {
                 reg_ex(false);
                 // if the recursive descent parser finishes, then make sure the entire regex has been parsed, otherwise throw an error
                 specReader.matchToken(SpecReader.terminal.END);
-                // if the recursive descent parser finishes and the entire regex has been parsed, then the parse for that line was successful
-                // System.out.println("Parse successful!");
             }
             checker.readLine();
         }
@@ -71,18 +71,20 @@ public class RegexParser {
         buildCharClassNFAs();
     }
 
+    /**
+     * Parses the entire Tokens portion of the Spec file
+     */
     public void parseTokens() {
         try {
             tokenNFAs = new ArrayList<NFA>();
             String l = checker.readLine();
+            // while not at the end of the Spec file
             while (l != null) {
                 specReader.set_up_new_line();
                 // parse through the regex using a recursive descent parser
                 reg_ex(true);
                 // if the recursive descent parser finishes, then make sure the entire regex has been parsed, otherwise throw an error
                 specReader.matchToken(SpecReader.terminal.END);
-                // if the recursive descent parser finishes and the entire regex has been parsed, then the parse for that line was successful
-                // System.out.println("Parse successful!");
                 l = checker.readLine();
             }
         }
@@ -118,11 +120,15 @@ public class RegexParser {
         SpecReader.terminal token = specReader.peekToken();
         if (token == SpecReader.terminal.UNION) {
             specReader.matchToken(token);
+            // to represent the right side of the union
             inProgressNFAs.push(new NFA());
             rexp1();
             rexp_prime();
+            // the right side of the union
             NFA after = inProgressNFAs.pop();
+            // the left side of the union
             NFA before = inProgressNFAs.pop();
+            // the union of the two
             inProgressNFAs.push(unionNFAs(before, after));
         }
         else {
@@ -150,22 +156,27 @@ public class RegexParser {
         SpecReader.terminal token = specReader.peekToken();
         if (token == SpecReader.terminal.PAR_OPEN) {
             specReader.matchToken(token);
+            // to represent the inside of the parentheses
             inProgressNFAs.push(new NFA());
             rexp();
             specReader.matchToken(SpecReader.terminal.PAR_CLOSE);
             rexp2_tail();
             NFA after = inProgressNFAs.pop();
             NFA before = inProgressNFAs.pop();
+            // concatenate whatever is before the parentheses with the completed inside of the parentheses
             inProgressNFAs.push(concatNFAs(before, after));
         }
         else if (token == SpecReader.terminal.RE_CHAR) {
             specReader.matchToken(token);
             CharacterClass cc = new CharacterClass("");
+            // build the character class for the regular character
             cc.setToTrue(specReader.tokens.get(specReader.tokens.size() - 1).tokens.get(specReader.tokens.get(specReader.tokens.size() - 1).tokens.size() - 1).characters.charAt(specReader.tokens.get(specReader.tokens.size() - 1).tokens.get(specReader.tokens.get(specReader.tokens.size() - 1).tokens.size() - 1).characters.length() - 1));
+            // build the NFA for the character class
             inProgressNFAs.push(cc.createNFA());
             rexp2_tail();
             NFA after = inProgressNFAs.pop();
             NFA before = inProgressNFAs.pop();
+            // concatenate the regular character NFA with whatever was before it
             inProgressNFAs.push(concatNFAs(before, after));
         }
         else {
@@ -178,11 +189,13 @@ public class RegexParser {
         if (token == SpecReader.terminal.STAR) {
             specReader.matchToken(token);
             NFA before = inProgressNFAs.pop();
+            // star whatever preceded the *
             inProgressNFAs.push(starNFA(before));
         }
         else if (token == SpecReader.terminal.PLUS) {
             specReader.matchToken(token);
             NFA before = inProgressNFAs.pop();
+            // plus whatever preceded the +
             inProgressNFAs.push(plusNFA(before));
         }
         else {
@@ -205,10 +218,13 @@ public class RegexParser {
         if (token == SpecReader.terminal.PERIOD) {
             specReader.matchToken(token);
             CharacterClass cc = new CharacterClass("");
+            // build the character class for .
             cc.setToTrue(' ', '~');
+            // create the NFA for .
             inProgressNFAs.push(cc.createNFA());
             NFA after = inProgressNFAs.pop();
             NFA before = inProgressNFAs.pop();
+            // concatenate the . with whatever preceded it
             inProgressNFAs.push(concatNFAs(before, after));
         }
         else if (token == SpecReader.terminal.SQUARE_OPEN) {
@@ -218,13 +234,16 @@ public class RegexParser {
         else if (token == SpecReader.terminal.DEFINED) {
             specReader.matchToken(token);
             int i = 0;
+            // find which defined char class it is
             for (i = 0; i < specReader.defined.size(); i++) {
                 if (specReader.tokens.get(specReader.tokens.size() - 1).tokens.get(specReader.tokens.get(specReader.tokens.size() - 1).tokens.size() - 1).characters.equals(specReader.defined.get(i).name)) {
                     break;
                 }
             }
+            // build the NFA for that char class
             NFA after = characterClasses.get(i).createNFA();
             NFA before = inProgressNFAs.pop();
+            // concatenate the defined char class NFA with whatever preceded it
             inProgressNFAs.push(concatNFAs(before, after));
         }
         else {
@@ -299,7 +318,7 @@ public class RegexParser {
     }
 
     public void buildCharClassNFAs() {
-        // Stores the built character classes
+        // Stores the built defined character classes
         characterClasses = new ArrayList<CharacterClass>();
         // For every character class that was parsed earlier
         for (int i = 0; i < specReader.defined.size(); i++) {
@@ -384,11 +403,18 @@ public class RegexParser {
             }
         }
         charClassNFAs = new ArrayList<NFA>();
+        // build the NFAs from the defined character classes
         for (int i = 0; i < characterClasses.size(); i++) {
             charClassNFAs.add(characterClasses.get(i).createNFA());
         }
     }
 
+    /**
+     * Concatenate n2 to the end of n1
+     * @param n1 :the front of the resulting concatenation
+     * @param n2 :the end of the resulting concatenation
+     * @return :the concatenated NFA
+     */
     public NFA concatNFAs(NFA n1, NFA n2) {
         NFA nfa = new NFA();
         nfa.states.remove(0);
@@ -410,6 +436,12 @@ public class RegexParser {
         return nfa;
     }
 
+    /**
+     * Union two NFAs
+     * @param n1
+     * @param n2
+     * @return :the union of the NFAs
+     */
     public NFA unionNFAs(NFA n1, NFA n2) {
         NFA nfa = new NFA();
         nfa.transitions.add(new Transition(nfa.start, null, true, n1.start));
@@ -433,6 +465,11 @@ public class RegexParser {
         return nfa;
     }
 
+    /**
+     * Star the NFA
+     * @param n1
+     * @return :star of the NFA
+     */
     public NFA starNFA(NFA n1) {
         NFA nfa = new NFA();
         nfa.states.remove(0);
@@ -448,6 +485,11 @@ public class RegexParser {
         return nfa;
     }
 
+    /**
+     * Plus the NFA
+     * @param n1
+     * @return :plus of the NFA
+     */
     public NFA plusNFA(NFA n1) {
         NFA nfa = new NFA();
         nfa.states.remove(0);

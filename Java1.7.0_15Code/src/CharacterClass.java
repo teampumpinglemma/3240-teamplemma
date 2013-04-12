@@ -53,6 +53,10 @@ public class CharacterClass {
         }
     }
 
+    /**
+     * Builds an NFA of two states and a single transition on the characters in this character class from the start state to the accept state
+     * @return NFA representing this character class
+     */
     public NFA createNFA() {
         NFA nfa = new NFA();
         nfa.transitions.add(new Transition(nfa.start, this, false));

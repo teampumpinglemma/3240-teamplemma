@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 
 /**
+ * Used for storing what the recursive descent parser parses: the name for what is being defined, and the tokens that make up the definition
+ *
  * Created with IntelliJ IDEA.
  * User: Mickey
  * Date: 3/30/13
@@ -11,6 +13,10 @@ public class Definition {
     String name;
     ArrayList<TokenWithCharacters> tokens;
 
+    /**
+     * Constructor
+     * @param name :the name for what is being defined
+     */
     public Definition(String name) {
         this.name = name;
         tokens = new ArrayList<TokenWithCharacters>();

@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 
 /**
+ * The union of all the NFAs built from the token definitions
+ *
  * Created with IntelliJ IDEA.
  * User: Mickey
  * Date: 4/11/13
@@ -8,10 +10,19 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class GiantNFA {
+    // the start state of the NFA
     State start;
+    // all the states in the NFA
     ArrayList<State> states;
+    // all the transitions in the NFA
     ArrayList<Transition> transitions;
+    // the accept states of the NFA (one for each token definition)
     ArrayList<State> acceptStates;
+
+    /**
+     * Constructor unions all the token NFAs
+     * @param nfas :the token NFAs
+     */
     public GiantNFA(ArrayList<NFA> nfas) {
         this.start = new State();
         this.states = new ArrayList<State>();

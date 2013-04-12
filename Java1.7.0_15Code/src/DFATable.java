@@ -2,6 +2,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
+ * The DFA Table, built from the Giant NFA.  Class also contains methods for walking through the table.
+ *
  * Created with IntelliJ IDEA.
  * User: Mickey
  * Date: 4/10/13
@@ -9,11 +11,19 @@ import java.util.LinkedList;
  * To change this template use File | Settings | File Templates.
  */
 public class DFATable {
+    // the table, stored as a list of rows (which represent DFA states)
     ArrayList<DFATableRow> tableRows;
     GiantNFA nfa;
+    // the current state while walking the table
     DFATableRow currentDFAState;
+    // for matching an accept state with its token
     ArrayList<Definition> tokens;
 
+    /**
+     * Builds the table
+     * @param nfa :from which to construct the table
+     * @param tokens :tokens to return upon the accept states
+     */
     public DFATable(GiantNFA nfa, ArrayList<Definition> tokens) {
         tableRows = new ArrayList<DFATableRow>();
         this.nfa = nfa;
@@ -23,7 +33,9 @@ public class DFATable {
         tableRows.add(new DFATableRow(eClosure(start)));
         LinkedList<DFATableRow> unfinished = new LinkedList<DFATableRow>();
         unfinished.add(tableRows.get(0));
+        // while there are still states without their transitions set
         while (!unfinished.isEmpty()) {
+            // set the transitions for the next unfinished state
             DFATableRow current = unfinished.remove();
             for (int j = 0; j < 95; j++) {
                 ArrayList<State> next = eClosure(move(current.nfaStates, j));
@@ -53,20 +65,33 @@ public class DFATable {
                         break;
                     }
                 }
+                // if the transition results in a brand new state
                 if (!completeMatch) {
+                    // set the transition to that new state
                     current.nextStates[j] = tableRows.size();
+                    // add the row for that new state to the table
                     tableRows.add(new DFATableRow(next));
+                    // add that new state to the list of states without their transitions set
                     unfinished.add(tableRows.get(tableRows.size() - 1));
                 }
             }
         }
+        // set the start state of the table
         currentDFAState = tableRows.get(0);
     }
 
+    /**
+     * Take one step through the table, setting the current state to the result of a transition on the read character
+     * @param character :the character on which to transition
+     */
     public void progress(int character) {
         currentDFAState = tableRows.get(currentDFAState.nextStates[character - 32]);
     }
 
+    /**
+     * See if the current state is an accept state
+     * @return :the token corresponding with the accept state, or null if it is not an accept state
+     */
     public Definition tryAccept() {
         for (int i = 0; i < currentDFAState.nfaStates.size(); i++) {
             int j = nfa.acceptStates.indexOf(currentDFAState.nfaStates.get(i));
@@ -77,6 +102,11 @@ public class DFATable {
         return null;
     }
 
+    /**
+     *
+     * @param inputStates :the states from which to expand on the empty string transitions
+     * @return :all the states reachable from the input states by transitioning on the empty string (including the input states)
+     */
     private ArrayList<State> eClosure(ArrayList<State> inputStates) {
         ArrayList<State> eClosure = new ArrayList<State>();
         LinkedList<State> investigate = new LinkedList<State>();
@@ -96,6 +126,12 @@ public class DFATable {
         return eClosure;
     }
 
+    /**
+     *
+     * @param inputStates :the states from which to attempt to transition on the character
+     * @param character :the character on which to transition
+     * @return :all the states reachable from the input states after a single transition on the character
+     */
     private ArrayList<State> move(ArrayList<State> inputStates, int character) {
         ArrayList<State> toReturn = new ArrayList<State>();
         for (int i = 0; i < inputStates.size(); i++) {

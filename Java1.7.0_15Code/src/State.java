@@ -1,4 +1,6 @@
 /**
+ * A State... stores no values, it's just a basic object
+ *
  * Created with IntelliJ IDEA.
  * User: Mickey
  * Date: 4/9/13

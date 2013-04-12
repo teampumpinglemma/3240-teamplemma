@@ -1,4 +1,6 @@
 /**
+ * Stores the tokens matched in the Spec file along with the characters that caused them
+ *
  * Created with IntelliJ IDEA.
  * User: Mickey
  * Date: 3/31/13
