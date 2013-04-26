@@ -19,6 +19,7 @@ public class LL1GrammarParser {
     String currentLine, currentRule, identifier;
     boolean startedLine = false;
     LinkedList<DefinitionWithCharacters> parsedTokens;
+    boolean stopParsingLine = false;
 
     /**
      * This file will be used to read the grammar from the specified input file.
@@ -64,7 +65,7 @@ public class LL1GrammarParser {
         currentLine = currentLine.trim();
 
         // If line is not empty
-        if (currentLine.length() > 0)
+        if ((currentLine.length() > 0) && (stopParsingLine == false))
         {
             // Read in next "word"
             String word = currentLine.substring(0, currentLine.indexOf(' '));
@@ -112,7 +113,7 @@ public class LL1GrammarParser {
             word = currentLine.substring(0, currentLine.indexOf(" "));
             word.trim();
 
-            while (word.length() > 0)
+            while ((word.length() > 0) && (stopParsingLine == false))
             {
                 // Check if current word is terminal or non-terminal
                 if (word.substring(0, 1).equals("<"))
@@ -157,10 +158,28 @@ public class LL1GrammarParser {
                 }
 
                 // Get next "word"
-                currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
-                currentLine.trim();
-                word = currentLine.substring(0, currentLine.indexOf(" "));
-                word.trim();
+                try
+                {
+                    currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
+                    System.out.println(currentLine);
+                    currentLine.trim();
+                    word = currentLine.substring(0, currentLine.indexOf(" "));
+                    System.out.println(word);
+                    word.trim();
+
+                    if (word.equals("end"))
+                    {
+                        stopParsingLine = true;
+                        word = "";
+                        currentLine = "";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    stopParsingLine = true;
+                    word = "";
+                    currentLine = "";
+                }
             }
 
             // Add final rule on the line
