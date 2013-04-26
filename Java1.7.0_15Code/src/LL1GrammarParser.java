@@ -32,13 +32,14 @@ public class LL1GrammarParser {
             nonTerminals = new ArrayList<String>();
             this.parsedTokens = parsedTokens;
 
-            /*for (int i = 0; i < parsedTokens.size(); i++)
+            for (int i = 0; i < parsedTokens.size(); i++)
             {
                 for (int j = 0; j < parsedTokens.get(i).definition.tokens.size(); j++)
                 {
+                    System.out.println(this.parsedTokens.get(i).definition.name + "   " + parsedTokens.get(i).definition.name);
                     System.out.println(this.parsedTokens.get(i).definition.tokens.get(j).token + "   " + parsedTokens.get(i).definition.tokens.get(j).token);
                 }
-            }      */
+            }
         }
         catch (Exception e) {
             System.out.println("Grammar parser construction error");
