@@ -137,7 +137,14 @@ public class LL1GrammarParser {
                 }
                 else // Terminal
                 {
-                    if (parsedTokens.contains(word))
+                    boolean matched = false;
+                    for (int i = 0; i < parsedTokens.size(); i++) {
+                        if (parsedTokens.get(i).definition.name.toUpperCase().equals("$" + word.toUpperCase())) {
+                            matched = true;
+                            break;
+                        }
+                    }
+                    if (matched)
                     {
                         currentRule = currentRule + " " + word;
                     }
