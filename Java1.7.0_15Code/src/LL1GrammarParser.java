@@ -29,7 +29,16 @@ public class LL1GrammarParser {
             buffReader = new BufferedReader(new FileReader(grammarFile));
             checker = new BufferedReader(new FileReader(grammarFile));
             rules = new ArrayList<String>();
+            nonTerminals = new ArrayList<String>();
             this.parsedTokens = parsedTokens;
+
+            /*for (int i = 0; i < parsedTokens.size(); i++)
+            {
+                for (int j = 0; j < parsedTokens.get(i).definition.tokens.size(); j++)
+                {
+                    System.out.println(this.parsedTokens.get(i).definition.tokens.get(j).token + "   " + parsedTokens.get(i).definition.tokens.get(j).token);
+                }
+            }      */
         }
         catch (Exception e) {
             System.out.println("Grammar parser construction error");
@@ -65,7 +74,7 @@ public class LL1GrammarParser {
                 // New rule for the new line
                 currentRule = word;
 
-                if (!nonTerminals.contains(word))
+                if ((!nonTerminals.isEmpty()) && (!nonTerminals.contains(word)))
                 {
                     nonTerminals.add(word);
                 }
@@ -78,7 +87,9 @@ public class LL1GrammarParser {
             }
 
             // Get next "word"
-            word = word.substring(word.indexOf(' '));
+            currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
+            currentLine.trim();
+            word = currentLine.substring(0, currentLine.indexOf(" "));
             word.trim();
 
             if (word.equals("::="))
@@ -95,7 +106,9 @@ public class LL1GrammarParser {
             }
 
             // Get next "word"
-            word = word.substring(word.indexOf(' '));
+            currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
+            currentLine.trim();
+            word = currentLine.substring(0, currentLine.indexOf(" "));
             word.trim();
 
             while (word.length() > 0)
@@ -130,13 +143,15 @@ public class LL1GrammarParser {
                     else
                     {
                         // Throw error
-                        System.out.println("Terminal not recognized");
+                        System.out.println("Terminal not recognized: " + word);
                         System.exit(0);
                     }
                 }
 
                 // Get next "word"
-                word = word.substring(word.indexOf(' '));
+                currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
+                currentLine.trim();
+                word = currentLine.substring(0, currentLine.indexOf(" "));
                 word.trim();
             }
 
@@ -145,6 +160,11 @@ public class LL1GrammarParser {
 
             // Go to next line because there are no more "words" left on line
             parseGrammar();
+        }
+
+        for (int i = 0; i < rules.size(); i++)
+        {
+            System.out.println(rules.get(i));
         }
     }
 }

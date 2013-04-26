@@ -55,6 +55,8 @@ public class Main {
         System.out.println("Success! Check your output files!");
 
         LL1GrammarParser parser = new LL1GrammarParser(new File(args[4]), tw.parsedTokens);
+        parser.parseGrammar();
+        System.out.println("BAM!!");
 
         /*
         System.out.println("Char Classes");
