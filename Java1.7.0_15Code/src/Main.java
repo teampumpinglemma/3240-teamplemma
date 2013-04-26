@@ -51,8 +51,11 @@ public class Main {
             System.out.println("Could not write to table file");
             System.exit(0);
         }
-        new TableWalker(regexParser.dfaTable, new File(args[1]), new File(args[3]));
+        TableWalker tw = new TableWalker(regexParser.dfaTable, new File(args[1]), new File(args[3]));
         System.out.println("Success! Check your output files!");
+
+        LL1GrammarParser parser = new LL1GrammarParser(new File(args[1]), tw.parsedTokens);
+
         /*
         System.out.println("Char Classes");
         for (int i = 0; i < regexParser.specReader.defined.size(); i++) {
