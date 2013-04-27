@@ -70,6 +70,7 @@ public class LL1GrammarParser {
             currentLine = lines.get(u);
             // Get rid of leading and trailing white space on line
             currentLine = currentLine.trim();
+            currentRule = "";
             //stopParsingLine = false;
             // If line is not empty
             int index = 0;
@@ -78,10 +79,11 @@ public class LL1GrammarParser {
             boolean matched = false;
             while((currentLine.length() > index) && (!state.equals("error")))
             {
-                System.out.println(state + " " + currentLine.charAt(index));
-		System.out.println("id "+identifier);
-		System.out.println("Rule "+u+": "+currentRule);
-		System.out.println("LINE: "+currentLine);
+//                System.out.println(state + " " + currentLine.charAt(index));
+//		System.out.println("id "+identifier);
+//		if(currentLine.charAt(index) == '|'){
+//		System.out.println("Rule "+u+": "+currentRule);
+//		System.out.println("LINE: "+currentLine);}
                 if(state.equals("Start")){
                     switch (currentLine.charAt(index)){
                         case '<':
@@ -186,7 +188,6 @@ public class LL1GrammarParser {
                              if ((!nonTerminals.isEmpty()) && (!nonTerminals.contains(word))){
                                  nonTerminals.add(word);
                              }
-                             System.out.println(word);
                              word = "";
                              break;
                          case '(':
@@ -288,31 +289,35 @@ public class LL1GrammarParser {
                              break;
                      }
                 }
-                index++;
-                if(index == currentLine.length() && word.length() != 0){
-                     matched = false;
-                     for (int i = 0; i < parsedTokens.size(); i++) {
-                         String s = "";
-                         for(int j = 0; j < parsedTokens.get(i).tokens.size();j++){
-                             s += parsedTokens.get(i).tokens.get(j).characters;
+                if(++index == currentLine.length()){
+                     if(word.length() != 0){
+                         matched = false;
+                         for (int i = 0; i < parsedTokens.size(); i++) {
+                             String s = "";
+                             for(int j = 0; j < parsedTokens.get(i).tokens.size();j++){
+                                 s += parsedTokens.get(i).tokens.get(j).characters;
+                             }
+                             if (s.equals(word)) {
+                                 matched = true;
+                                 break;
+                             }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
+                                 matched = true;
+                                 word = s;
+                                 break;
+                             }
                          }
-                         if (s.equals(word)) {
-                             matched = true;
-                             break;
-                         }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
-                             matched = true;
-                             word = s;
-                             break;
+                         if (matched){
+                             currentRule = currentRule + " " + word;
+                         }else{
+                             System.out.println("Terminal not recognized: " + word);
+                             System.exit(0);
                          }
                      }
-                     if (matched){
-                         currentRule = currentRule + " " + word;
-                     }else{
-                         System.out.println("Terminal not recognized: " + word);
-                         System.exit(0);
+                     if(!currentRule.equals("")){
+                             rules.add(currentRule);
                      }
-                     rules.add(currentRule);
-                } 
+                }
+                 
            }
         }
 
