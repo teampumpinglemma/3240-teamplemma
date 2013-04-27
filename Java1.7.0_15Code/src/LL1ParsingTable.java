@@ -11,18 +11,45 @@ public class LL1ParsingTable {
 
     ArrayList<grammarRules> rules;
     ArrayList<parserSet> FIRST, FOLLOW;
-    boolean addNewRule;
+    boolean addNewRule, addFirstWord;
 
     /**
      * This will be the file that creates the LL(1) Parsing Table, the FIRST sets, and the FOLLOW sets.
      */
     public LL1ParsingTable(ArrayList<String> notFormatted)
     {
+        addNewRule = true;
         // Change rules into "proper" grammarRules class format
         reformatRules(notFormatted);
 
+<<<<<<< HEAD
         // Create FIRST and FOLLOW sets
         createFollowSet();
+=======
+        // Create FIRST set
+        FIRST = new ArrayList<parserSet>();
+
+        for (int i = 0; i < rules.size(); i++)
+        {
+            parserSet firstSet = new parserSet(rules.get(i).identifier);
+            FIRST.add(firstSet);
+        }
+        for (int i = 0; i < rules.size(); i++)
+        {
+            createFirstSet(rules.get(i));
+        }
+
+        System.out.println("wwooooowww " + FIRST.size());
+
+        // DEBUG PRINT STATEMENT
+        for (int i = 0; i < FIRST.size(); i++)
+        {
+            for (int j = 0; j < FIRST.get(i).set.size(); j++)
+            {
+                System.out.println(FIRST.get(i).nonTerminal + " " + FIRST.get(i).set.get(j));
+            }
+        }
+>>>>>>> a17df68c480501098cc4e51313098b183404f12e
     }
 
     public void reformatRules(ArrayList<String> notFormatted)
@@ -33,7 +60,7 @@ public class LL1ParsingTable {
         for (int i = 0; i < notFormatted.size(); i ++)
         {
             int index = notFormatted.get(i).indexOf("::=");
-            identifier = notFormatted.get(i).substring(0, index);
+            identifier = notFormatted.get(i).substring(0, index - 1);
 
             // Check if identifier is already in ArrayList of grammarRules
             for (int z = 0; z < rules.size(); z++)
@@ -41,7 +68,7 @@ public class LL1ParsingTable {
                 if (rules.get(z).identifier.equals(identifier))
                 {
                     // Add rule to that location
-                    rules.get(z).rulesList.add(notFormatted.get(i).substring(index + 1));
+                    rules.get(z).rulesList.add(notFormatted.get(i).substring(index + 4));
                     addNewRule = false;
                 }
                 else
@@ -58,7 +85,7 @@ public class LL1ParsingTable {
 
                 // Add rule to that location
                 rules.add(rule);
-                rules.get(rules.size() - 1).rulesList.add(notFormatted.get(i).substring(index + 1));
+                rules.get(rules.size() - 1).rulesList.add(notFormatted.get(i).substring(index + 4));
             }
         }
     }
@@ -66,23 +93,33 @@ public class LL1ParsingTable {
     /**
      * This method creates the FIRST sets for the grammar file.
      */
-    public void createFirstSet()
+    public void createFirstSet(grammarRules rule)
     {
-        FIRST = new ArrayList<parserSet>();
-
-        // Taken and modified from lecture slides
-        for (int i = 0; i < rules.size(); i++)
+        // Get first word from current rule
+        for (int i = 0; i < rule.rulesList.size(); i ++)
         {
-            parserSet firstSet = new parserSet(rules.get(i).identifier);
-            FIRST.add(firstSet);
-        }
+            int space = rule.rulesList.indexOf(" ");
+            String firstWord = rule.rulesList.get(i).substring(space + 1);
 
-        for (int i = 0; i < rules.size(); i ++)
-        {
-            for (int j = 0; j < rules.get(i).rulesList.size(); j++)
+            for (int k = 0; k < rules.size(); k ++)
             {
-                // Get first word
+                if (firstWord.equals(rules.get(k).identifier))
+                {
+                    addFirstWord = false;
+                    createFirstSet(rules.get(k));
+                }
+            }
 
+            if (addFirstWord)
+            {
+                // Add firstWord to first set
+                for (int k = 0; k < FIRST.size(); k ++)
+                {
+                    if (rule.identifier.equals(FIRST.get(k).nonTerminal))
+                    {
+                        FIRST.get(k).set.add(firstWord);
+                    }
+                }
             }
         }
     }
