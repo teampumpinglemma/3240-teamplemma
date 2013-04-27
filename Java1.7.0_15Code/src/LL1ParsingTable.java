@@ -22,6 +22,7 @@ public class LL1ParsingTable {
         reformatRules(notFormatted);
 
         // Create FIRST and FOLLOW sets
+        createFollowSet();
     }
 
     public void reformatRules(ArrayList<String> notFormatted)
@@ -91,6 +92,34 @@ public class LL1ParsingTable {
      */
     public void createFollowSet()
     {
+        //createFirstSet();
+        FOLLOW = new ArrayList<parserSet>();
         // Taken from lecture slides
+        parserSet start = new parserSet(rules.get(0).identifier);
+        start.set.add("$");
+        FOLLOW.add(start);
+        boolean changes = true;
+        for(int i = 1; i < rules.size(); i++){
+            FOLLOW.add(new parserSet(rules.get(i).identifier));
+        }
+        while(changes){
+             for(int i = 0; i < rules.size(); i++){
+                 
+                 for(int j = 0; j < rules.get(i).rulesList.size(); j++){
+                     String rl = rules.get(i).rulesList.get(j);
+                     String curNT = "";
+                     System.out.println(rl);
+                     for(int k = 0; k < rl.length();k++){
+                         if(rl.charAt(k) == '<'){
+                             curNT += rl.charAt(k);
+                         }else if(curNT.length() > 0){
+                             curNT += rl.charAt(k);
+                             if(rl.charAt(k) == '>'){
+                                 FOLLOW.get(rules.get(i).identifier)
+                         }
+                     }
+                 }
+             }
+        }
     }
 }
