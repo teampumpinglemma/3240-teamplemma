@@ -19,6 +19,8 @@ public class LL1ParsingTable {
     public LL1ParsingTable(ArrayList<String> notFormatted)
     {
         addNewRule = true;
+        addFirstWord = true;
+
         // Change rules into "proper" grammarRules class format
         reformatRules(notFormatted);
 
@@ -40,6 +42,7 @@ public class LL1ParsingTable {
         // DEBUG PRINT STATEMENT
         for (int i = 0; i < FIRST.size(); i++)
         {
+            System.out.println(FIRST.get(i).nonTerminal);
             for (int j = 0; j < FIRST.get(i).set.size(); j++)
             {
                 System.out.println(FIRST.get(i).nonTerminal + " " + FIRST.get(i).set.get(j));
@@ -83,6 +86,14 @@ public class LL1ParsingTable {
                 rules.get(rules.size() - 1).rulesList.add(notFormatted.get(i).substring(index + 4));
             }
         }
+
+        /*for (int i = 0; i < rules.size(); i++)
+        {
+            for (int j = 0; j < rules.get(i).rulesList.size(); j++)
+            {
+                System.out.println(rules.get(i).identifier + " " + rules.get(i).rulesList.get(j));
+            }
+        }*/
     }
 
     /**
@@ -90,6 +101,7 @@ public class LL1ParsingTable {
      */
     public void createFirstSet(grammarRules rule)
     {
+        System.out.println("blaahhhhh");
         // Get first word from current rule
         for (int i = 0; i < rule.rulesList.size(); i ++)
         {
