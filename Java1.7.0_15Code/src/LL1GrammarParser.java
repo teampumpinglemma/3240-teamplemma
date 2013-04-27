@@ -61,11 +61,6 @@ public class LL1GrammarParser {
                 System.exit(0);
             }
         }
-                             /*for (int i = 0; i < parsedTokens.size(); i++) {
-                                  System.out.print(parsedTokens.get(i).definition.name + " ");
-			 for(int j = 0; j < parsedTokens.get(i).definition.tokens.size();j++){
-                                     System.out.print ("|"+parsedTokens.get(i).definition.tokens.get(j).characters+"|");} System.out.println();
-                             }*/
         for(int u = 0; u < lines.size(); u++){
             currentLine = lines.get(u);
             // Get rid of leading and trailing white space on line
@@ -163,11 +158,31 @@ public class LL1GrammarParser {
                              currentRule += " \\(";
                              break;
                          case ')':
+                             matched = false;
+                             for (int i = 0; i < parsedTokens.size(); i++) {
+                                 String s = "";
+                                 for(int j = 0; j < parsedTokens.get(i).tokens.size();j++){
+                                     s += parsedTokens.get(i).tokens.get(j).characters;
+                                 }
+                                 if (s.equals(word)) {
+                                     matched = true;
+                                     break;
+                                 }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
+                                     matched = true;
+                                     word = s;
+                                     break;
+                                 }
+                             }
+                             if (matched){
+                                 currentRule = currentRule + " " + word;
+                             }
                              if(word != ""){
                                  currentRule += " " + word;
                              }
+                             word = "";
                              currentRule += " \\)";
                              break;
+
                          default:
                              word = Character.toString(currentLine.charAt(index));
                              state = "TPred";
@@ -197,12 +212,30 @@ public class LL1GrammarParser {
                              currentRule += " \\(";
                              break;
                          case ')':
+                             matched = false;
+                             for (int i = 0; i < parsedTokens.size(); i++) {
+                                 String s = "";
+                                 for(int j = 0; j < parsedTokens.get(i).tokens.size();j++){
+                                     s += parsedTokens.get(i).tokens.get(j).characters;
+                                 }
+                                 if (s.equals(word)) {
+                                     matched = true;
+                                     break;
+                                 }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
+                                     matched = true;
+                                     word = s;
+                                     break;
+                                 }
+                             }
+                             if (matched){
+                                 currentRule = currentRule + " " + word;
+                             }
                              if(word != ""){
                                  currentRule += " " + word;
                              }
+                             word = "";
                              currentRule += " \\)";
                              break;
-
                          default:
                              word = word.concat(Character.toString(currentLine.charAt(index)));
                              break;
@@ -257,9 +290,6 @@ public class LL1GrammarParser {
                              }
                              if (matched){
                                  currentRule = currentRule + " " + word;
-                             }else{
-                                 System.out.println("Terminal not recognized: " + word);
-                                 System.exit(0);
                              }
                              if (!currentRule.equals("")){
                                  rules.add(currentRule);
@@ -274,9 +304,28 @@ public class LL1GrammarParser {
                              currentRule += " \\(";
                              break;
                          case ')':
+                             matched = false;
+                             for (int i = 0; i < parsedTokens.size(); i++) {
+                                 String s = "";
+                                 for(int j = 0; j < parsedTokens.get(i).tokens.size();j++){
+                                     s += parsedTokens.get(i).tokens.get(j).characters;
+                                 }
+                                 if (s.equals(word)) {
+                                     matched = true;
+                                     break;
+                                 }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
+                                     matched = true;
+                                     word = s;
+                                     break;
+                                 }
+                             }
+                             if (matched){
+                                 currentRule = currentRule + " " + word;
+                             }
                              if(word != ""){
                                  currentRule += " " + word;
                              }
+                             word = "";
                              currentRule += " \\)";
                              break;
                          case '<':
