@@ -44,143 +44,152 @@ public class LL1GrammarParser {
 
     public void parseGrammar()
     {
+        ArrayList<String> lines = new ArrayList();
         // Need list of terminals (tokens) and non-terminals
         try
         {
-            currentLine = buffReader.readLine();
+            String s_temp = buffReader.readLine();
+            while(s_temp != null){
+                lines.add(s_temp);
+                s_temp = buffReader.readLine();
+            }
         }
         catch(Exception ex)
         {
-            System.out.println("Error reading file");
-            System.exit(0);
+            if(lines.size() != 0){
+                System.out.println("Error reading file");
+                System.exit(0);
+            }
         }
+        for(int u = 0; u < lines.size(); u++){
+            currentLine = lines.get(u);
+            // Get rid of leading and trailing white space on line
+            currentLine = currentLine.trim();
 
-        // Get rid of leading and trailing white space on line
-        currentLine = currentLine.trim();
-
-        // If line is not empty
-        if ((currentLine.length() > 0) && (stopParsingLine == false))
-        {
-            // Read in next "word"
-            String word = currentLine.substring(0, currentLine.indexOf(' '));
-
-            // Check if word is non-terminal
-            if (word.substring(0, 1).equals("<"))
+            // If line is not empty
+            if ((currentLine.length() > 0) && (stopParsingLine == false))
             {
-                // New rule for the new line
-                currentRule = word;
+                // Read in next "word"
+                String word = currentLine.substring(0, currentLine.indexOf(' '));
 
-                if ((!nonTerminals.isEmpty()) && (!nonTerminals.contains(word)))
-                {
-                    nonTerminals.add(word);
-                }
-            }
-            else
-            {
-                // Throw error
-                System.out.println("Must start rule with <non-terminal>");
-                System.exit(0);
-            }
-
-            // Get next "word"
-            currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
-            currentLine.trim();
-            word = currentLine.substring(0, currentLine.indexOf(" "));
-            word.trim();
-
-            if (word.equals("::="))
-            {
-                // Current rule is new identifier
-                currentRule = currentRule + " " + word;
-                identifier = currentRule;
-            }
-            else
-            {
-                // Throw error
-                System.out.println("Rule must contain ::= in proper location");
-                System.exit(0);
-            }
-
-            // Get next "word"
-            currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
-            currentLine.trim();
-            word = currentLine.substring(0, currentLine.indexOf(" "));
-            word.trim();
-
-            while ((word.length() > 0) && (stopParsingLine == false))
-            {
-                // Check if current word is terminal or non-terminal
+                // Check if word is non-terminal
                 if (word.substring(0, 1).equals("<"))
                 {
-                    // Non-terminal
-                    currentRule = currentRule + " " + word;
+                    // New rule for the new line
+                    currentRule = word;
 
-                    if (!nonTerminals.contains(word))
+                    if ((!nonTerminals.isEmpty()) && (!nonTerminals.contains(word)))
                     {
                         nonTerminals.add(word);
                     }
                 }
-                else if (word.equals("|"))
+                else
                 {
-                    // Add next terminals/non-terminals to rules ArrayList (unless there are more |'s or end of line)
-                    if (!currentRule.equals(""))
-                    {
-                        rules.add(currentRule);
-                    }
-
-                    currentRule = identifier;
-                }
-                else // Terminal
-                {
-                    boolean matched = false;
-                    for (int i = 0; i < parsedTokens.size(); i++) {
-                        if (parsedTokens.get(i).definition.name.toUpperCase().equals("$" + word.toUpperCase())) {
-                            matched = true;
-                            break;
-                        }
-                    }
-                    if (matched)
-                    {
-                        currentRule = currentRule + " " + word;
-                    }
-                    else
-                    {
-                        // Throw error
-                        System.out.println("Terminal not recognized: " + word);
-                        System.exit(0);
-                    }
+                    // Throw error
+                    System.out.println("Must start rule with <non-terminal>");
+                    System.exit(0);
                 }
 
                 // Get next "word"
-                try
-                {
-                    currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
-                    System.out.println(currentLine);
-                    currentLine.trim();
-                    word = currentLine.substring(0, currentLine.indexOf(" "));
-                    System.out.println(word);
-                    word.trim();
+                currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
+                currentLine.trim();
+                word = currentLine.substring(0, currentLine.indexOf(" "));
+                word.trim();
 
-                    if (word.equals("end"))
+                if (word.equals("::="))
+                {
+                    // Current rule is new identifier
+                    currentRule = currentRule + " " + word;
+                    identifier = currentRule;
+                }
+                else
+                {
+                    // Throw error
+                    System.out.println("Rule must contain ::= in proper location");
+                    System.exit(0);
+                }
+
+                // Get next "word"
+                currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
+                currentLine.trim();
+                word = currentLine.substring(0, currentLine.indexOf(" "));
+                word.trim();
+
+                while ((word.length() > 0) && (stopParsingLine == false))
+                {
+                    // Check if current word is terminal or non-terminal
+                    if (word.substring(0, 1).equals("<"))
+                    {
+                        // Non-terminal
+                        currentRule = currentRule + " " + word;
+
+                        if (!nonTerminals.contains(word))
+                        {
+                            nonTerminals.add(word);
+                        }
+                    }
+                    else if (word.equals("|"))
+                    {
+                        // Add next terminals/non-terminals to rules ArrayList (unless there are more |'s or end of line)
+                        if (!currentRule.equals(""))
+                        {
+                            rules.add(currentRule);
+                        }
+
+                        currentRule = identifier;
+                    }
+                    else // Terminal
+                    {
+                        boolean matched = false;
+                        for (int i = 0; i < parsedTokens.size(); i++) {
+                            if (parsedTokens.get(i).definition.name.toUpperCase().equals("$" + word.toUpperCase())) {
+                                matched = true;
+                                break;
+                            }
+                        }
+                        if (matched)
+                        {
+                            currentRule = currentRule + " " + word;
+                        }
+                        else
+                        {
+                            // Throw error
+                            System.out.println("Terminal not recognized: " + word);
+                            System.exit(0);
+                        }
+                    }
+
+                    // Get next "word"
+                    try
+                    {
+                        currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
+                        System.out.println(currentLine);
+                        currentLine.trim();
+                        word = currentLine.substring(0, currentLine.indexOf(" "));
+                        System.out.println(word);
+                        word.trim();
+
+                        if (word.equals("end"))
+                        {
+                            stopParsingLine = true;
+                            word = "";
+                            currentLine = "";
+                        }
+                    }
+                    catch (Exception ex)
                     {
                         stopParsingLine = true;
                         word = "";
                         currentLine = "";
                     }
                 }
-                catch (Exception ex)
-                {
-                    stopParsingLine = true;
-                    word = "";
-                    currentLine = "";
-                }
+
+                // Add final rule on the line
+                rules.add(currentRule);
+
+                // Go to next line because there are no more "words" left on line
+                //parseGrammar();
             }
-
-            // Add final rule on the line
-            rules.add(currentRule);
-
-            // Go to next line because there are no more "words" left on line
-            parseGrammar();
         }
 
         for (int i = 0; i < rules.size(); i++)
