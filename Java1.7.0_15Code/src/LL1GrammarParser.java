@@ -20,13 +20,13 @@ public class LL1GrammarParser {
     ArrayList<String> nonTerminals;
     String currentLine, currentRule, identifier;
     boolean startedLine = false;
-    LinkedList<DefinitionWithCharacters> parsedTokens;
+    ArrayList<Definition> parsedTokens;
     boolean stopParsingLine = false;
 
     /**
      * This file will be used to read the grammar from the specified input file.
      */
-    public LL1GrammarParser(File grammarFile, LinkedList<DefinitionWithCharacters> parsedTokens)
+    public LL1GrammarParser(File grammarFile, ArrayList<Definition> parsedTokens)
     {
         try {
             buffReader = new BufferedReader(new FileReader(grammarFile));
@@ -61,11 +61,11 @@ public class LL1GrammarParser {
                 System.exit(0);
             }
         }
-                             for (int i = 0; i < parsedTokens.size(); i++) {
+                             /*for (int i = 0; i < parsedTokens.size(); i++) {
                                   System.out.print(parsedTokens.get(i).definition.name + " ");
 			 for(int j = 0; j < parsedTokens.get(i).definition.tokens.size();j++){
                                      System.out.print ("|"+parsedTokens.get(i).definition.tokens.get(j).characters+"|");} System.out.println();
-                             }
+                             }*/
         for(int u = 0; u < lines.size(); u++){
             currentLine = lines.get(u);
             // Get rid of leading and trailing white space on line
@@ -79,9 +79,9 @@ public class LL1GrammarParser {
             while((currentLine.length() > index) && (!state.equals("error")))
             {
                 System.out.println(state + " " + currentLine.charAt(index));
-/*		System.out.println("id "+identifier);
+		System.out.println("id "+identifier);
 		System.out.println("Rule "+u+": "+currentRule);
-		System.out.println("LINE: "+currentLine);*/
+		System.out.println("LINE: "+currentLine);
                 if(state.equals("Start")){
                     switch (currentLine.charAt(index)){
                         case '<':
@@ -148,15 +148,23 @@ public class LL1GrammarParser {
                              word = "<";
                              state = "NTPred";
                              break;
-                         case '>':
-                             System.out.println("Invalid character");
-                             System.exit(0);
-                             break;
                          case '|':
                              if (!currentRule.equals("")){
                                  rules.add(currentRule);
                              }
                              currentRule = identifier.toString();
+                             break;
+                         case '(':
+                             if(word != ""){
+                                 currentRule += " " + word;
+                             }
+                             currentRule += " \\(";
+                             break;
+                         case ')':
+                             if(word != ""){
+                                 currentRule += " " + word;
+                             }
+                             currentRule += " \\)";
                              break;
                          default:
                              word = Character.toString(currentLine.charAt(index));
@@ -178,8 +186,22 @@ public class LL1GrammarParser {
                              if ((!nonTerminals.isEmpty()) && (!nonTerminals.contains(word))){
                                  nonTerminals.add(word);
                              }
+                             System.out.println(word);
                              word = "";
                              break;
+                         case '(':
+                             if(word != ""){
+                                 currentRule += " " + word;
+                             }
+                             currentRule += " \\(";
+                             break;
+                         case ')':
+                             if(word != ""){
+                                 currentRule += " " + word;
+                             }
+                             currentRule += " \\)";
+                             break;
+
                          default:
                              word = word.concat(Character.toString(currentLine.charAt(index)));
                              break;
@@ -190,10 +212,20 @@ public class LL1GrammarParser {
                          case '\t':
                              matched = false;
                              for (int i = 0; i < parsedTokens.size(); i++) {
-                                 if (parsedTokens.get(i).definition.name.toUpperCase().equals("$" + word.toUpperCase())) {
+                                 String s = "";
+                                 for(int j = 0; j < parsedTokens.get(i).tokens.size();j++){
+                                     s += parsedTokens.get(i).tokens.get(j).characters;
+                                 }
+                             
+                                 if (s.equals(word)) {
                                      matched = true;
                                      break;
+                                 }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
+                                     matched = true;
+                                     word = s;
+                                     break;
                                  }
+
                              }
                              if (matched){
                                  currentRule = currentRule + " " + word;
@@ -207,10 +239,20 @@ public class LL1GrammarParser {
                          case '|':
                              matched = false;
                              for (int i = 0; i < parsedTokens.size(); i++) {
-                                 if (parsedTokens.get(i).definition.name.toUpperCase().equals("$" + word.toUpperCase())) {
+                                 String s = "";
+                                 for(int j = 0; j < parsedTokens.get(i).tokens.size();j++){
+                                     s += parsedTokens.get(i).tokens.get(j).characters;
+                                 }
+                             
+                                 if (s.equals(word)) {
                                      matched = true;
                                      break;
+                                 }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
+                                     matched = true;
+                                     word = s;
+                                     break;
                                  }
+
                              }
                              if (matched){
                                  currentRule = currentRule + " " + word;
@@ -224,6 +266,18 @@ public class LL1GrammarParser {
                              currentRule = identifier.toString();
                              word = "";
                              break;
+                         case '(':
+                             if(word != ""){
+                                 currentRule += " " + word;
+                             }
+                             currentRule += " \\(";
+                             break;
+                         case ')':
+                             if(word != ""){
+                                 currentRule += " " + word;
+                             }
+                             currentRule += " \\)";
+                             break;
                          case '<':
                              currentRule = currentRule.concat(" " + word);
                              state = "NTPred";
@@ -234,17 +288,20 @@ public class LL1GrammarParser {
                              break;
                      }
                 }
-		System.out.println(word);
                 index++;
                 if(index == currentLine.length() && word.length() != 0){
                      matched = false;
                      for (int i = 0; i < parsedTokens.size(); i++) {
                          String s = "";
-                         for(int j = 0; j < parsedTokens.get(i).definition.tokens.size();j++){
-                             s += parsedTokens.get(i).definition.tokens.get(j).characters;
+                         for(int j = 0; j < parsedTokens.get(i).tokens.size();j++){
+                             s += parsedTokens.get(i).tokens.get(j).characters;
                          }
                          if (s.equals(word)) {
                              matched = true;
+                             break;
+                         }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
+                             matched = true;
+                             word = s;
                              break;
                          }
                      }
@@ -256,131 +313,7 @@ public class LL1GrammarParser {
                      }
                      rules.add(currentRule);
                 } 
-                // Read in next "word"
- //               String word = currentLine.substring(0, currentLine.indexOf(' '));
-
- //               // Check if word is non-terminal
- //               if (word.substring(0, 1).equals("<"))
- //               {
- //                   // New rule for the new line
- //                   currentRule = word;
-
- //                   if ((!nonTerminals.isEmpty()) && (!nonTerminals.contains(word)))
- //                   {
- //                       nonTerminals.add(word);
- //                   }
- //               }
- //               else
- //               {
- //                   // Throw error
- //                   System.out.println("Must start rule with <non-terminal>");
- //                   System.exit(0);
- //               }
-
- //               // Get next "word"
- //               currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
- //               currentLine.trim();
- //               word = currentLine.substring(0, currentLine.indexOf(" "));
- //               word.trim();
-
- //               if (word.equals("::="))
- //               {
- //                   // Current rule is new identifier
- //                   currentRule = currentRule + " " + word;
- //                   identifier = currentRule;
- //               }
- //               else
- //               {
- //                   // Throw error
- //                   System.out.println("Rule must contain ::= in proper location");
- //                   System.exit(0);
- //               }
-
- //               // Get next "word"
- //               try{
- //                   currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
- //               }catch(StringIndexOutOfBoundsException e){
- //                   
- //               currentLine.trim();
- //               word = currentLine.substring(0, currentLine.indexOf(" "));
- //               word.trim();
-
- //               while ((word.length() > 0) && (stopParsingLine == false))
- //               {
- //                   // Check if current word is terminal or non-terminal
- //                   if (word.substring(0, 1).equals("<"))
- //                   {
- //                       // Non-terminal
- //                       currentRule = currentRule + " " + word;
-
- //                       if (!nonTerminals.contains(word))
- //                       {
- //                           nonTerminals.add(word);
- //                       }
- //                   }
- //                   else if (word.equals("|"))
- //                   {
- //                       // Add next terminals/non-terminals to rules ArrayList (unless there are more |'s or end of line)
- //                       if (!currentRule.equals(""))
- //                       {
- //                           rules.add(currentRule);
- //                       }
-
- //                       currentRule = identifier;
- //                   }
- //                   else // Terminal
- //                   {
- //                       boolean matched = false;
- //                       for (int i = 0; i < parsedTokens.size(); i++) {
- //                           if (parsedTokens.get(i).definition.name.toUpperCase().equals("$" + word.toUpperCase())) {
- //                               matched = true;
- //                               break;
- //                           }
- //                       }
- //                       if (matched)
- //                       {
- //                           currentRule = currentRule + " " + word;
- //                       }
- //                       else
- //                       {
- //                           // Throw error
- //                           System.out.println("Terminal not recognized: " + word);
- //                           System.exit(0);
- //                       }
- //                   }
-
- //                   // Get next "word"
- //                   try
- //                   {
- //                       currentLine = currentLine.substring(currentLine.indexOf(" ") + 1);
- //                       System.out.println(currentLine);
- //                       currentLine.trim();
- //                       word = currentLine.substring(0, currentLine.indexOf(" "));
- //                       System.out.println(word);
- //                       word.trim();
-
- //                       if (word.equals("end"))
- //                       {
- //                           stopParsingLine = true;
- //                           word = "";
- //                           currentLine = "";
- //                       }
- //                   }
- //                   catch (Exception ex)
- //                   {
- //                       stopParsingLine = true;
- //                       word = "";
- //                       currentLine = "";
- //                   }
- //               }
-
-
- //               // Add final rule on the line
- //               rules.add(currentRule);
-
-                // Go to next line because there are no more "words" left on line
-                //parseGrammar();
-            }
+           }
         }
 
         for (int i = 0; i < rules.size(); i++)

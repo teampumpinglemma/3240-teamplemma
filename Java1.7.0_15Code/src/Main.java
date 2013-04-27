@@ -54,7 +54,7 @@ public class Main {
         TableWalker tw = new TableWalker(regexParser.dfaTable, new File(args[1]), new File(args[3]));
         System.out.println("Success! Check your output files!");
 
-        LL1GrammarParser parser = new LL1GrammarParser(new File(args[4]), tw.parsedTokens);
+        LL1GrammarParser parser = new LL1GrammarParser(new File(args[4]), regexParser.specReader.tokens);
         parser.parseGrammar();
         System.out.println("BAM!!");
 
