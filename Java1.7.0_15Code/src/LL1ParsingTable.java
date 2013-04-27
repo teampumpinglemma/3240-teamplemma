@@ -24,13 +24,8 @@ public class LL1ParsingTable {
         // Change rules into "proper" grammarRules class format
         reformatRules(notFormatted);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
         // Create FIRST and FOLLOW sets
-        createFollowSet();
-=======
-=======
->>>>>>> a17df68c480501098cc4e51313098b183404f12e
+        //createFollowSet();
         // Create FIRST set
         FIRST = new ArrayList<parserSet>();
 
@@ -55,10 +50,6 @@ public class LL1ParsingTable {
                 System.out.println(FIRST.get(i).nonTerminal + " " + FIRST.get(i).set.get(j));
             }
         }
-<<<<<<< HEAD
->>>>>>> a17df68c480501098cc4e51313098b183404f12e
-=======
->>>>>>> a17df68c480501098cc4e51313098b183404f12e
     }
 
     public void reformatRules(ArrayList<String> notFormatted)
