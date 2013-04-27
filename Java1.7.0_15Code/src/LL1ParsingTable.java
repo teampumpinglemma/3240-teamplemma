@@ -11,7 +11,7 @@ public class LL1ParsingTable {
 
     ArrayList<grammarRules> rules;
     ArrayList<parserSet> FIRST, FOLLOW;
-    boolean addNewRule;
+    boolean addNewRule, addFirstWord;
 
     /**
      * This will be the file that creates the LL(1) Parsing Table, the FIRST sets, and the FOLLOW sets.
@@ -21,7 +21,18 @@ public class LL1ParsingTable {
         // Change rules into "proper" grammarRules class format
         reformatRules(notFormatted);
 
-        // Create FIRST and FOLLOW sets
+        // Create FIRST set
+        FIRST = new ArrayList<parserSet>();
+
+        for (int i = 0; i < rules.size(); i++)
+        {
+            parserSet firstSet = new parserSet(rules.get(i).identifier);
+            FIRST.add(firstSet);
+        }
+        for (int i = 0; i < rules.size(); i++)
+        {
+            createFirstSet(rules.get(i));
+        }
     }
 
     public void reformatRules(ArrayList<String> notFormatted)
@@ -32,7 +43,7 @@ public class LL1ParsingTable {
         for (int i = 0; i < notFormatted.size(); i ++)
         {
             int index = notFormatted.get(i).indexOf("::=");
-            identifier = notFormatted.get(i).substring(0, index);
+            identifier = notFormatted.get(i).substring(0, index - 1);
 
             // Check if identifier is already in ArrayList of grammarRules
             for (int z = 0; z < rules.size(); z++)
@@ -65,23 +76,33 @@ public class LL1ParsingTable {
     /**
      * This method creates the FIRST sets for the grammar file.
      */
-    public void createFirstSet()
+    public void createFirstSet(grammarRules rule)
     {
-        FIRST = new ArrayList<parserSet>();
-
-        // Taken and modified from lecture slides
-        for (int i = 0; i < rules.size(); i++)
+        // Get first word from current rule
+        for (int i = 0; i < rule.rulesList.size(); i ++)
         {
-            parserSet firstSet = new parserSet(rules.get(i).identifier);
-            FIRST.add(firstSet);
-        }
+            int space = rule.rulesList.indexOf(" ");
+            String firstWord = rule.rulesList.get(i).substring(space + 1);
 
-        for (int i = 0; i < rules.size(); i ++)
-        {
-            for (int j = 0; j < rules.get(i).rulesList.size(); j++)
+            for (int k = 0; k < rules.size(); k ++)
             {
-                // Get first word
+                if (firstWord.equals(rules.get(k).identifier))
+                {
+                    addFirstWord = false;
+                    createFirstSet(rules.get(k));
+                }
+            }
 
+            if (addFirstWord)
+            {
+                // Add firstWord to first set
+                for (int k = 0; k < FIRST.size(); k ++)
+                {
+                    if (rule.identifier.equals(FIRST.get(k).nonTerminal))
+                    {
+                        FIRST.get(k).set.add(firstWord);
+                    }
+                }
             }
         }
     }
