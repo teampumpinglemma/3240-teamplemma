@@ -56,20 +56,13 @@ public class Main {
 
         LL1GrammarParser parser = new LL1GrammarParser(new File(args[4]), regexParser.specReader.tokens);
         parser.parseGrammar();
-<<<<<<< HEAD
-<<<<<<< HEAD
-        LL1ParsingTable t = new LL1ParsingTable(parser.rules);
-=======
+
 
         System.out.println();
         System.out.println();
         System.out.println();
-        LL1ParsingTable parsingTable = new LL1ParsingTable(parser.rules);
->>>>>>> a17df68c480501098cc4e51313098b183404f12e
-=======
 
         LL1ParsingTable parsingTable = new LL1ParsingTable(parser.rules);
->>>>>>> a17df68c480501098cc4e51313098b183404f12e
         System.out.println("BAM!!");
 
 
