@@ -27,6 +27,11 @@ public class LL1ParsingTable {
         // Create FIRST and FOLLOW sets
         //createFollowSet();
         // Create FIRST set
+        createFIRSTset();
+    }
+
+    public void createFIRSTset()
+    {
         FIRST = new ArrayList<parserSet>();
 
         for (int i = 0; i < rules.size(); i++)
@@ -49,7 +54,7 @@ public class LL1ParsingTable {
             {
                 System.out.println(FIRST.get(i).nonTerminal + " " + FIRST.get(i).set.get(j));
             }
-        }  */
+        } */
     }
 
     public void reformatRules(ArrayList<String> notFormatted)
@@ -103,17 +108,28 @@ public class LL1ParsingTable {
      */
     public void createFirstSet(grammarRules rule)
     {
-        System.out.println("blaahhhhh");
         // Get first word from current rule
         for (int i = 0; i < rule.rulesList.size(); i ++)
         {
             int space = rule.rulesList.indexOf(" ");
             String firstWord = rule.rulesList.get(i).substring(space + 1);
+            space = firstWord.indexOf(" ");
+            if (space >= 0)
+            {
+                firstWord = firstWord.substring(0, space + 1);
+                firstWord.trim();
+            }
+            else
+            {
+                firstWord.trim();
+            }
 
             for (int k = 0; k < rules.size(); k ++)
             {
+                System.out.println(firstWord + " " + rules.get(k).identifier);
                 if (firstWord.equals(rules.get(k).identifier))
                 {
+                    System.out.println(firstWord + " " + rules.get(k).identifier);
                     addFirstWord = false;
                     createFirstSet(rules.get(k));
                 }
