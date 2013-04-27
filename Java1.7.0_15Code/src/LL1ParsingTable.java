@@ -138,6 +138,10 @@ public class LL1ParsingTable {
      */
     public void createFollowSet()
     {
+        createFIRSTset();
         // Taken from lecture slides
+        for(int i = 0; i < rules.size()){
+            FOLLOW.add(rules.get(i));
+        }
     }
 }
