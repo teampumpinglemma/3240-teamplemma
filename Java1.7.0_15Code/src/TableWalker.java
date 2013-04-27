@@ -90,6 +90,7 @@ public class TableWalker {
                         // write the most recently accepted token to the output file
                         outputWriter.write(dwc.definition.name + " " + dwc.characters);
                         outputWriter.newLine();
+			System.out.println(dwc.characters);
                         parsedTokens.add(dwc);
                         // reset toRead to the character right after the most recently accepted
                         toRead = markToRead;

@@ -61,6 +61,11 @@ public class LL1GrammarParser {
                 System.exit(0);
             }
         }
+                             for (int i = 0; i < parsedTokens.size(); i++) {
+                                  System.out.print(parsedTokens.get(i).definition.name + " ");
+			 for(int j = 0; j < parsedTokens.get(i).definition.tokens.size();j++){
+                                     System.out.print ("|"+parsedTokens.get(i).definition.tokens.get(j).characters+"|");} System.out.println();
+                             }
         for(int u = 0; u < lines.size(); u++){
             currentLine = lines.get(u);
             // Get rid of leading and trailing white space on line
@@ -73,7 +78,10 @@ public class LL1GrammarParser {
             boolean matched = false;
             while((currentLine.length() > index) && (!state.equals("error")))
             {
-/*                System.out.println(state);*/
+                System.out.println(state + " " + currentLine.charAt(index));
+/*		System.out.println("id "+identifier);
+		System.out.println("Rule "+u+": "+currentRule);
+		System.out.println("LINE: "+currentLine);*/
                 if(state.equals("Start")){
                     switch (currentLine.charAt(index)){
                         case '<':
@@ -115,13 +123,11 @@ public class LL1GrammarParser {
                          case '=':
                              word = word.concat(Character.toString(currentLine.charAt(index)));
                              if(!word.equals("::=")){
-                                 /*System.out.println(word);*/
                                  System.out.println("Rule must contain ::= in proper location");
                                  System.exit(0);
                              }else{
                                  currentRule = currentRule.concat(" " + word);
                                  identifier = currentRule.toString();
-			/*	System.out.println("id "+identifier);*/
                                  word = "";
                                  state = "Pred";
                              }
@@ -228,6 +234,28 @@ public class LL1GrammarParser {
                              break;
                      }
                 }
+		System.out.println(word);
+                index++;
+                if(index == currentLine.length() && word.length() != 0){
+                     matched = false;
+                     for (int i = 0; i < parsedTokens.size(); i++) {
+                         String s = "";
+                         for(int j = 0; j < parsedTokens.get(i).definition.tokens.size();j++){
+                             s += parsedTokens.get(i).definition.tokens.get(j).characters;
+                         }
+                         if (s.equals(word)) {
+                             matched = true;
+                             break;
+                         }
+                     }
+                     if (matched){
+                         currentRule = currentRule + " " + word;
+                     }else{
+                         System.out.println("Terminal not recognized: " + word);
+                         System.exit(0);
+                     }
+                     rules.add(currentRule);
+                } 
                 // Read in next "word"
  //               String word = currentLine.substring(0, currentLine.indexOf(' '));
 
@@ -352,9 +380,6 @@ public class LL1GrammarParser {
 
                 // Go to next line because there are no more "words" left on line
                 //parseGrammar();
-		/*System.out.println("Rule "+u+": "+currentRule);
-		System.out.println("LINE: "+currentLine);*/
-                index++;
             }
         }
 
