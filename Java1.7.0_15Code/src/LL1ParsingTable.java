@@ -51,7 +51,7 @@ public class LL1ParsingTable {
                 if (rules.get(z).identifier.equals(identifier))
                 {
                     // Add rule to that location
-                    rules.get(z).rulesList.add(notFormatted.get(i).substring(index + 1));
+                    rules.get(z).rulesList.add(notFormatted.get(i).substring(index + 4));
                     addNewRule = false;
                 }
                 else
@@ -68,7 +68,7 @@ public class LL1ParsingTable {
 
                 // Add rule to that location
                 rules.add(rule);
-                rules.get(rules.size() - 1).rulesList.add(notFormatted.get(i).substring(index + 1));
+                rules.get(rules.size() - 1).rulesList.add(notFormatted.get(i).substring(index + 4));
             }
         }
     }
