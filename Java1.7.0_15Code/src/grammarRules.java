@@ -11,7 +11,8 @@ public class grammarRules {
     String identifier;
     ArrayList<String> rulesList;
 
-    public grammarRules() {
+    public grammarRules(String name) {
+        identifier = name;
         rulesList = new ArrayList<String>();
     }
 }
