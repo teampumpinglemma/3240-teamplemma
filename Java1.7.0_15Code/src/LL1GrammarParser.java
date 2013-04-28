@@ -370,9 +370,9 @@ public class LL1GrammarParser {
            }
         }
 
-        for (int i = 0; i < rules.size(); i++)
+        /*for (int i = 0; i < rules.size(); i++)
         {
             System.out.println(rules.get(i));
-        }
+        }*/
     }
 }

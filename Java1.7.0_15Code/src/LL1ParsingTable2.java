@@ -12,7 +12,6 @@ public class LL1ParsingTable2 {
 
     Hashtable<String, String[]> rules;
     Hashtable<String, String[]> FIRST, FOLLOW;
-    Hashtable<String, String[]> subs;
     String base = "";
     boolean addNewRule, addFirstWord;
 
@@ -21,32 +20,6 @@ public class LL1ParsingTable2 {
      */
     public LL1ParsingTable2(ArrayList<String> notFormatted, File sFile)
     {
-        try{
-             BufferedReader b = new BufferedReader(new FileReader(sFile));
-             subs = new Hashtable<String, String[]>();
-             String s = b.readLine();
-             while(!s.equals("")){
-                 String cat = s.substring(s.indexOf(" ")+1, s.length());
-                 int st = cat.indexOf("[")+1;
-                 int ls = cat.indexOf("]");
-                 ArrayList<String> lis = new ArrayList<String>();
-                 if(ls - st >= 3){
-                     for(int i = st; i < ls; i+=3){
-                         int beg = i;
-                         int en = i+2;
-                         for(int j = ((int)cat.charAt(beg)); j<((int)cat.charAt(en))+1; j++){
-                             lis.add(Character.toString((char)j));
-                         }
-                     }
-                     subs.put(s.substring(0,s.indexOf(" ")), ((String[])lis.toArray(new String[0])));
-                 }
-                 s = b.readLine();
-             }
-        }catch(Exception e){
-             e.printStackTrace();
-             System.out.println("Spec missing");
-             System.exit(0);
-        }
             
         addNewRule = true;
         addFirstWord = true;
@@ -58,6 +31,7 @@ public class LL1ParsingTable2 {
         //createFollowSet();
         // Create FIRST set
         createFirstSet();
+        createFollowSet();
     }
 
     public void reformatRules(ArrayList<String> nf){
@@ -97,23 +71,6 @@ public class LL1ParsingTable2 {
         return ((String[])a.toArray(new String[0]));
     }
 
-    public String[] unescape(String s){
-        if(s.charAt(0) == '$'){
-            s = s.substring(0,s.indexOf("("));
-        }
-        if(subs.get(s) != null){
-            return subs.get(s);
-        }else{
-            String[] ret = new String[1];
-            if(s.charAt(0) == '\\'){
-                ret[0] = Character.toString(s.charAt(1));
-            }else{
-                ret[0] = Character.toString(s.charAt(0));
-            }
-            return ret;
-        }
-    }
-
     public void createFirstSet(){
         Hashtable <String, ArrayList<String>> f = new Hashtable<String, ArrayList<String>>();
         for(String A: rules.keySet()){
@@ -130,18 +87,21 @@ public class LL1ParsingTable2 {
                      while(cont & k < pc.length){
                          if(pc[k].charAt(0) != '<'){
                              //System.out.println(pc[k]);
-                             for(String chr : unescape(pc[k])){
-                                 if((!f.get(A).contains(chr))){//unescape(pc[k])[0]))){ 
-                                     f.get(A).add(chr);
-                                     change = true;
-                                 }
+                             if((!f.get(A).contains(pc[k]))){
+                                 f.get(A).add(pc[k]);
+                                 change = true;
                              }
                          }else if(pc[k].charAt(0) == '<' && !pc[k].equals("<epsilon>")){
                              for(String temp : f.get(pc[k])){
-                                 if(!f.get(A).contains(temp)){
+                                 if(!f.get(A).contains(temp) && !temp.equals("<epsilon>")){
                                      f.get(A).add(temp);
                                      change = true;
                                  }
+                             }
+                         }else if(pc[k].equals("<epsilon>")){
+                             if(!f.get(A).contains("<epsilon>")){
+                                 f.get(A).add("<epsilon>");
+                                 change = true;
                              }
                          }
                          cont = false;
@@ -163,9 +123,22 @@ public class LL1ParsingTable2 {
         FIRST = new Hashtable<String,String[]>();
         for(String k: f.keySet()){
             FIRST.put(k, ((String[])f.get(k).toArray(new String[0])));
+           /* System.out.print(k+":");
             for(String l:f.get(k))
-                System.out.println(k + " "+ l);
+                System.out.print(" "+l);
+            System.out.println();*/
         }
+    }
+
+    public boolean aContains(String[] a, String in){
+        if(a == null)
+            return false;
+        for(String s:a){
+            if(s.equals(in)){
+                return true;
+            }
+        }
+        return false;
     }
     
     public void createFollowSet(){
@@ -180,8 +153,47 @@ public class LL1ParsingTable2 {
             for(String A: rules.keySet()){
                 for(String p: rules.get(A)){
                     String[] pc = spSplit(p);
+                    for(int i = 0; i < pc.length; i++){
+                        if(pc[i].charAt(0) == '<' && pc[i] != "<epsilon>"){
+                            int j = i;
+                            while(++j < pc.length){
+                                if(pc[j].charAt(0) == '<' && pc[j] != "<epsilon>"){
+                                    for(String chr: FIRST.get(pc[j])){
+                                        if(!f.get(pc[i]).contains(chr) && !chr.equals("<epsilon>")){
+                                            f.get(pc[i]).add(chr);
+                                            change = true;
+                                        }
+                                    }
+                                }else if(pc[j].charAt(0) != '<'){
+                                    if(!f.get(pc[i]).contains(pc[j])){
+                                        f.get(pc[i]).add(pc[j]);
+                                        change = true;
+                                    }
+                                }
+                                if(!aContains(FIRST.get(pc[j]),"<epsilon>")){
+                                    j = pc.length+1;
+                                }
+                            }
+                            if(j == pc.length && pc[i].charAt(0) == '<' && !pc[i].equals("<epsilon>")){
+                                for(String chr:f.get(A)){
+                                    if(!f.get(pc[i]).contains(chr) && !chr.equals("<epsilon>")){
+                                        f.get(pc[i]).add(chr);
+                                        change = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
+        }
+        FOLLOW = new Hashtable<String, String[]>();
+        for(String k : f.keySet()){
+            FOLLOW.put(k, ((String[])f.get(k).toArray(new String[0])));
+            /*System.out.print(k+":");
+            for(String l:f.get(k))
+                System.out.print(" "+l);
+            System.out.println();*/
         }
     }
 }
