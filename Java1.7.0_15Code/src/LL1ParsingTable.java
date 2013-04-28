@@ -195,8 +195,8 @@ public class LL1ParsingTable {
     {
         createFIRSTset();
         // Taken from lecture slides
-        for(int i = 0; i < rules.size()){
+       /* for(int i = 0; i < rules.size()){
             FOLLOW.add(rules.get(i));
-        }
+        } */
     }
 }
