@@ -4,13 +4,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-/**
- * Created with IntelliJ IDEA.
- * User: emilyCheatham
- * Date: 4/25/13
- * Time: 2:34 PM
- * To change this template use File | Settings | File Templates.
- */
 public class LL1GrammarParser {
 
     BufferedReader buffReader, checker;
@@ -166,10 +159,11 @@ public class LL1GrammarParser {
                                  }
                                  if (s.equals(word)) {
                                      matched = true;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
                                      matched = true;
-                                     word = s;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }
                              }
@@ -220,10 +214,11 @@ public class LL1GrammarParser {
                                  }
                                  if (s.equals(word)) {
                                      matched = true;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
                                      matched = true;
-                                     word = s;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }
                              }
@@ -253,10 +248,11 @@ public class LL1GrammarParser {
                              
                                  if (s.equals(word)) {
                                      matched = true;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
                                      matched = true;
-                                     word = s;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }
 
@@ -280,10 +276,11 @@ public class LL1GrammarParser {
                              
                                  if (s.equals(word)) {
                                      matched = true;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
                                      matched = true;
-                                     word = s;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }
 
@@ -312,10 +309,11 @@ public class LL1GrammarParser {
                                  }
                                  if (s.equals(word)) {
                                      matched = true;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
                                      matched = true;
-                                     word = s;
+                                     word = parsedTokens.get(i).name;
                                      break;
                                  }
                              }
@@ -348,10 +346,11 @@ public class LL1GrammarParser {
                              }
                              if (s.equals(word)) {
                                  matched = true;
+                                 word = parsedTokens.get(i).name;
                                  break;
                              }else if(parsedTokens.get(i).name.substring(1,parsedTokens.get(i).name.length()).equals(word)){
                                  matched = true;
-                                 word = s;
+                                 word = parsedTokens.get(i).name;
                                  break;
                              }
                          }

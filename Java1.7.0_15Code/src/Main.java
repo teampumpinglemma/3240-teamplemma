@@ -60,63 +60,14 @@ public class Main {
 
         System.out.println("Creating First and Follow Sets: ");
 
-        LL1ParsingTable2 parsingTable = new LL1ParsingTable2(parser.rules, new File(args[0]));
+        LL1FFSets sets = new LL1FFSets(parser.rules);
+
+        System.out.println("Working on the Parsing Table");
+
+        LL1ParsingTable table = new LL1ParsingTable(sets, regexParser.specReader.tokens,tw.parsedTokens, parser.rules);
+        //System.out.println(table.run());
         System.out.println("BAM!!");
 
 
-        /*
-        System.out.println("Char Classes");
-        for (int i = 0; i < regexParser.specReader.defined.size(); i++) {
-            System.out.println(regexParser.specReader.defined.get(i).name);
-            System.out.print("\t");
-            for (int j = 0; j < regexParser.specReader.defined.get(i).tokens.size(); j++) {
-                System.out.print(regexParser.specReader.defined.get(i).tokens.get(j).token.toString() + " " + regexParser.specReader.defined.get(i).tokens.get(j).characters + "   ");
-            }
-            System.out.println();
-        }
-        System.out.println("\nTokens");
-        for (int i = 0; i < regexParser.specReader.tokens.size(); i++) {
-            System.out.println(regexParser.specReader.tokens.get(i).name);
-            System.out.print("\t");
-            for (int j = 0; j < regexParser.specReader.tokens.get(i).tokens.size(); j++) {
-                System.out.print(regexParser.specReader.tokens.get(i).tokens.get(j).token.toString() + " " + regexParser.specReader.tokens.get(i).tokens.get(j).characters + "   ");
-            }
-            System.out.println();
-        }
-
-        System.out.println("\nBuilt Character Classes");
-        for (int i = 0; i < regexParser.characterClasses.size(); i++) {
-            System.out.println(regexParser.characterClasses.get(i).name);
-            boolean[] accepted = regexParser.characterClasses.get(i).accepted;
-            for (int j = 0; j < accepted.length; j++) {
-                if (accepted[j]) {
-                    System.out.print(" " + (char)(j + 32));
-                }
-            }
-            System.out.println();
-        }
-        System.out.println("\nDFA Table");
-        for (int i = 0; i < regexParser.dfaTable.tableRows.size(); i++) {
-            System.out.println(i);
-            for (int j = 0; j < regexParser.dfaTable.tableRows.get(i).nfaStates.size(); j++) {
-                System.out.print(regexParser.dfaTable.tableRows.get(i).nfaStates.get(j).toString() + " ");
-            }
-            System.out.println();
-            for (int j = 0; j < 95; j++) {
-                if (regexParser.dfaTable.tableRows.get(i).nextStates[j] != 1) {
-                    System.out.print("   " + (char)(j + 32) + " " + regexParser.dfaTable.tableRows.get(i).nextStates[j]);
-                }
-            }
-            System.out.println();
-        }
-        System.out.println("Accept");
-        for (int j = 0; j < regexParser.dfaTable.tableRows.size(); j++) {
-            for (int i = 0; i < regexParser.dfaTable.nfa.acceptStates.size(); i++) {
-                if (regexParser.dfaTable.tableRows.get(j).nfaStates.contains(regexParser.dfaTable.nfa.acceptStates.get(i))) {
-                    System.out.print(" " + j);
-                }
-            }
-        }
-        */
     }
 }

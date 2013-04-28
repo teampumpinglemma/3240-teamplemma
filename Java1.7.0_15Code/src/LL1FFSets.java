@@ -13,23 +13,17 @@ public class LL1FFSets {
     Hashtable<String, String[]> rules;
     Hashtable<String, String[]> FIRST, FOLLOW;
     String base = "";
-    boolean addNewRule, addFirstWord;
 
     /**
      * This will be the file that creates the LL(1) Parsing Table, the FIRST sets, and the FOLLOW sets.
      */
-    public LL1FFSets(ArrayList<String> notFormatted, File sFile)
+    public LL1FFSets(ArrayList<String> notFormatted)
     {
             
-        addNewRule = true;
-        addFirstWord = true;
-
         // Change rules into "proper" grammarRules class format
         reformatRules(notFormatted);
 
         // Create FIRST and FOLLOW sets
-        //createFollowSet();
-        // Create FIRST set
         createFirstSet();
         createFollowSet();
     }
