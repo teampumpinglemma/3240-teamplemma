@@ -8,7 +8,7 @@ import java.io.*;
  * Time: 2:31 PM
  * To change this template use File | Settings | File Templates.
  */
-public class LL1ParsingTable2 {
+public class LL1FFSets {
 
     Hashtable<String, String[]> rules;
     Hashtable<String, String[]> FIRST, FOLLOW;
@@ -18,7 +18,7 @@ public class LL1ParsingTable2 {
     /**
      * This will be the file that creates the LL(1) Parsing Table, the FIRST sets, and the FOLLOW sets.
      */
-    public LL1ParsingTable2(ArrayList<String> notFormatted, File sFile)
+    public LL1FFSets(ArrayList<String> notFormatted, File sFile)
     {
             
         addNewRule = true;
