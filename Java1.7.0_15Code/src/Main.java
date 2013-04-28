@@ -62,7 +62,7 @@ public class Main {
         System.out.println();
         System.out.println();
 
-        LL1ParsingTable parsingTable = new LL1ParsingTable(parser.rules);
+        LL1ParsingTable2 parsingTable = new LL1ParsingTable2(parser.rules);
         System.out.println("BAM!!");
 
 
