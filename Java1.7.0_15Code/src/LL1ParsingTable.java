@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Time: 2:31 PM
  * To change this template use File | Settings | File Templates.
  */
-public class LL1ParsingTable {
+/*public class LL1ParsingTable {
 
     ArrayList<grammarRules> rules;
     ArrayList<parserSet> FIRST, FOLLOW;
@@ -16,7 +16,7 @@ public class LL1ParsingTable {
     /**
      * This will be the file that creates the LL(1) Parsing Table, the FIRST sets, and the FOLLOW sets.
      */
-    public LL1ParsingTable(ArrayList<String> notFormatted)
+/*    public LL1ParsingTable(ArrayList<String> notFormatted)
     {
         addNewRule = true;
         addFirstWord = true;
@@ -55,7 +55,7 @@ public class LL1ParsingTable {
                 System.out.println(FIRST.get(i).nonTerminal + " " + FIRST.get(i).set.get(j));
             }
         } */
-    }
+/*    }
 
     public void reformatRules(ArrayList<String> notFormatted)
     {
@@ -101,12 +101,12 @@ public class LL1ParsingTable {
                 System.out.println(rules.get(i).identifier + " " + rules.get(i).rulesList.get(j));
             }
         } */
-    }
+  /*  }
 
     /**
      * This method creates the FIRST sets for the grammar file.
      */
-    public void createFirstSet(grammarRules rule)
+/*    public void createFirstSet(grammarRules rule)
     {
         // Get first word from current rule
         for (int i = 0; i < rule.rulesList.size(); i ++)
@@ -152,12 +152,22 @@ public class LL1ParsingTable {
     /**
      * This method creates the FOLLOW sets for the grammar file.
      */
-    public void createFollowSet()
+/*    public void createFollowSet()
     {
+        FOLLOW = new ArrayList<parserSet>();
         createFIRSTset();
         // Taken from lecture slides
         for(int i = 0; i < rules.size()){
-            FOLLOW.add(rules.get(i));
+            FOLLOW.add(new parserSet(rules.get(i).identifier));
+        }
+        FOLLOW.get(0).set.add("$");
+        boolean changes = true;
+        while(changes){
+           for(int i = 0; i < FOLLOW.size(); i++){
+               String A = FOLLOW.get(i).nonterminal;
+               for(int j = 0; j < FOLLOW.get(i).set.size(); j++){
+                   String[] X = spacePart(FOLLOW.get(i).set.get(j));
+                   boolean nt = nt(X);
         }
     }
-}
+}*/
