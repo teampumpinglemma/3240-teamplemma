@@ -11,7 +11,9 @@ import java.util.ArrayList;
 
     ArrayList<grammarRules> rules;
     ArrayList<parserSet> FIRST, FOLLOW;
-    boolean addNewRule, addFirstWord;
+    ArrayList<grammarRules> markedForLater;
+    ArrayList<String> laterWord;
+    boolean addNewRule;
 
     /**
      * This will be the file that creates the LL(1) Parsing Table, the FIRST sets, and the FOLLOW sets.
@@ -19,10 +21,11 @@ import java.util.ArrayList;
 /*    public LL1ParsingTable(ArrayList<String> notFormatted)
     {
         addNewRule = true;
-        addFirstWord = true;
+        markedForLater = new ArrayList<grammarRules>();
+        laterWord = new ArrayList<String>();
 
         // Change rules into "proper" grammarRules class format
-        reformatRules(notFormatted);
+        reformatRulesEmily(notFormatted);
 
         // Create FIRST and FOLLOW sets
         //createFollowSet();
@@ -44,20 +47,61 @@ import java.util.ArrayList;
             createFirstSet(rules.get(i));
         }
 
+        // For generating first set for rules that are recursive
+       /* for (int i = 0; i < markedForLater.size(); i++)
+        {
+            int officialIndex = 0;
+
+            for (int j = 0; j < FIRST.size(); j++)
+            {
+                // Need to know where current rule is in FIRST
+                if (FIRST.get(j).nonTerminal.equals(markedForLater.get(i).identifier))
+                {
+                    officialIndex = j;
+                }
+            }
+
+            for (int j = 0; j < FIRST.size(); j++)
+            {
+                System.out.println(FIRST.get(j).nonTerminal + " " + laterWord.get(i));
+                for (int k = 0; k < FIRST.get(j).set.size(); k++)
+                {
+                    for (int l = 0; l < FIRST.get(officialIndex).set.size(); l++)
+                    {
+                        if (!(FIRST.get(officialIndex).set.get(l).equals(FIRST.get(j).set.get(k))))
+                        {
+                            addNewRule = true;
+                        }
+                        //System.out.print(FIRST.get(j).set.get(k) + " ");
+                    }
+
+                    if (addNewRule)
+                    {
+                        FIRST.get(officialIndex).set.add(FIRST.get(j).set.get(k));
+                    }
+                }
+            }
+        }*/
+
         System.out.println("wwooooowww " + FIRST.size());
 
         // DEBUG PRINT STATEMENT
-        /*for (int i = 0; i < FIRST.size(); i++)
+        for (int i = 0; i < FIRST.size(); i++)
         {
             //System.out.println(FIRST.get(i).nonTerminal);
             for (int j = 0; j < FIRST.get(i).set.size(); j++)
             {
                 System.out.println(FIRST.get(i).nonTerminal + " " + FIRST.get(i).set.get(j));
             }
+<<<<<<< HEAD
         } */
 /*    }
+=======
+        }
+    }
+>>>>>>> 1d95d884eb77fa224418626da148a04906aac35f
 
-    public void reformatRules(ArrayList<String> notFormatted)
+    public void reformatRulesEmily(ArrayList<String> notFormatted)
     {
         String identifier = "";
         rules = new ArrayList<grammarRules>();
@@ -117,25 +161,25 @@ import java.util.ArrayList;
             if (space >= 0)
             {
                 firstWord = firstWord.substring(0, space + 1);
-                firstWord.trim();
+                firstWord = firstWord.trim();
             }
             else
             {
-                firstWord.trim();
+                firstWord = firstWord.trim();
             }
 
+            boolean notFound = true;
             for (int k = 0; k < rules.size(); k ++)
             {
-                System.out.println(firstWord + " " + rules.get(k).identifier);
                 if (firstWord.equals(rules.get(k).identifier))
                 {
-                    System.out.println(firstWord + " " + rules.get(k).identifier);
-                    addFirstWord = false;
-                    createFirstSet(rules.get(k));
+                    markedForLater.add(rules.get(k));
+                    laterWord.add(firstWord);
+                    notFound = false;
                 }
             }
 
-            if (addFirstWord)
+            if (notFound)
             {
                 // Add firstWord to first set
                 for (int k = 0; k < FIRST.size(); k ++)
@@ -157,6 +201,7 @@ import java.util.ArrayList;
         FOLLOW = new ArrayList<parserSet>();
         createFIRSTset();
         // Taken from lecture slides
+<<<<<<< HEAD
         for(int i = 0; i < rules.size()){
             FOLLOW.add(new parserSet(rules.get(i).identifier));
         }
@@ -169,5 +214,10 @@ import java.util.ArrayList;
                    String[] X = spacePart(FOLLOW.get(i).set.get(j));
                    boolean nt = nt(X);
         }
+=======
+       /* for(int i = 0; i < rules.size()){
+            FOLLOW.add(rules.get(i));
+        } */
+>>>>>>> 1d95d884eb77fa224418626da148a04906aac35f
     }
 }*/
