@@ -60,7 +60,7 @@ public class Main {
 
         System.out.println("Creating First and Follow Sets: ");
 
-        LL1ParsingTable2 parsingTable = new LL1ParsingTable2(parser.rules);
+        LL1ParsingTable2 parsingTable = new LL1ParsingTable2(parser.rules, new File(args[0]));
         System.out.println("BAM!!");
 
 

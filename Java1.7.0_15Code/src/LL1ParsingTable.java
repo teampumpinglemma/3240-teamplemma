@@ -83,7 +83,7 @@ import java.util.ArrayList;
             }
         }*/
 
-        System.out.println("wwooooowww " + FIRST.size());
+/*        System.out.println("wwooooowww " + FIRST.size());
 
         // DEBUG PRINT STATEMENT
         for (int i = 0; i < FIRST.size(); i++)
@@ -218,6 +218,6 @@ import java.util.ArrayList;
        /* for(int i = 0; i < rules.size()){
             FOLLOW.add(rules.get(i));
         } */
->>>>>>> 1d95d884eb77fa224418626da148a04906aac35f
+/*>>>>>>> 1d95d884eb77fa224418626da148a04906aac35f
     }
 }*/
