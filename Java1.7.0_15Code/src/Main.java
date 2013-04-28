@@ -58,9 +58,7 @@ public class Main {
         parser.parseGrammar();
 
 
-        System.out.println();
-        System.out.println();
-        System.out.println();
+        System.out.println("Creating First and Follow Sets: ");
 
         LL1ParsingTable parsingTable = new LL1ParsingTable(parser.rules);
         System.out.println("BAM!!");
