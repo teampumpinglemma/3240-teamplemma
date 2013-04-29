@@ -65,7 +65,7 @@ public class Main {
         System.out.println("Working on the Parsing Table");
 
         LL1ParsingTable table = new LL1ParsingTable(sets, regexParser.specReader.tokens,tw.parsedTokens, parser.rules);
-        //System.out.println(table.run());
+        System.out.println(table.run());
         System.out.println("BAM!!");
 
 

@@ -182,12 +182,12 @@ public class LL1FFSets {
             }
         }
         FOLLOW = new Hashtable<String, String[]>();
-        for(String k : f.keySet()){
+        /*for(String k : f.keySet()){
             FOLLOW.put(k, ((String[])f.get(k).toArray(new String[0])));
-            /*System.out.print(k+":");
+            System.out.print(k+":");
             for(String l:f.get(k))
                 System.out.print(" "+l);
-            System.out.println();*/
-        }
+            System.out.println();
+        }*/
     }
 }
