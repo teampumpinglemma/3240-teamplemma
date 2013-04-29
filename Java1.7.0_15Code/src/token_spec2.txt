@@ -1,0 +1,13 @@
+$ALPHANUM [a-zA-Z0-9]
+
+$SEMICOLON ;
+$TF ($TRUE|$FALSE|)
+$BEGIN begin
+$END end
+$IF if
+$ELSE else
+$OTHER ($ALPHANUM)+
+$LPAREN \(
+$RPAREN \)
+$TRUE 1
+$FALSE 0

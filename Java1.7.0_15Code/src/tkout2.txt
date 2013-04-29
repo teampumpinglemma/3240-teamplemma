@@ -1,0 +1,15 @@
+$BEGIN begin
+$IF if
+$LPAREN (
+$OTHER rhutabega
+$RPAREN )
+$OTHER off
+$SEMICOLON ;
+$ELSE else
+$IF if
+$LPAREN (
+$TRUE 1
+$RPAREN )
+$OTHER on
+$SEMICOLON ;
+$END end

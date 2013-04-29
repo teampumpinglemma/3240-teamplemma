@@ -1,0 +1,6 @@
+begin
+if ( 0 )
+off;
+else if (1)
+on;
+end

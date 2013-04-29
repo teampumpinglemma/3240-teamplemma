@@ -1,0 +1,5 @@
+<ifthen> ::= begin <statement> end
+<statement> ::= <if-stmt> | OTHER ;
+<if-stmt> ::= if ( <exp> ) <statement> <else-part>
+<else-part> ::= else <statement> | <epsilon>
+<exp> ::= 0 | 1
