@@ -1,7 +1,7 @@
 $BEGIN begin
 $IF if
 $LPAREN (
-$FALSE 0
+$OTHER rhutabega
 $RPAREN )
 $OTHER off
 $SEMICOLON ;

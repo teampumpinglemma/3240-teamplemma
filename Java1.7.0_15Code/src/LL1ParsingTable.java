@@ -222,11 +222,11 @@ public class LL1ParsingTable {
                   }
                }
                if(!noerr)
-                   return "Error : invalid token "+ psd[i] + "at token" + i;
+                   return "Error : invalid token "+ psd[i] + " at token #" + i + "\nUnacceptable File";
            }
        }
        if(ps.empty() && i >= psd.length)
            return "File is acceptable";
-       return "Reject : Reached end of statement before end of file";
+       return "Reject : Reached end of statement before end of file\nUnacceptable File";
     }
 }

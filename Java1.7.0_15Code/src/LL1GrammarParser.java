@@ -97,7 +97,7 @@ public class LL1GrammarParser {
                         case '\t':
                             break;
                         default:
-                            System.out.println("Must start rule with <non-terminal>\nLine:" + index);
+                            System.out.println("Must start rule with <non-terminal>\nLine: " + index);
                             System.exit(0);
                      }
                 }else if(state.equals("Record_st")){
@@ -105,7 +105,7 @@ public class LL1GrammarParser {
                      switch (currentLine.charAt(index)){
                          case ' ':
                          case '\t':
-                             System.out.println("Error: Space in word\nLine:" + index);
+                             System.out.println("Error: Space in word\nLine: " + index);
                              System.exit(0);
                              break;
                          case '>':
@@ -130,7 +130,7 @@ public class LL1GrammarParser {
                          case '=':
                              word = word.concat(Character.toString(currentLine.charAt(index)));
                              if(!word.equals("::=")){
-                                 System.out.println("Rule must contain ::= in proper location\nLine:" + index);
+                                 System.out.println("Rule must contain ::= in proper location\nLine: " + index);
                                  System.exit(0);
                              }else{
                                  currentRule = currentRule.concat(" " + word);
@@ -143,7 +143,7 @@ public class LL1GrammarParser {
                              word = word.concat(Character.toString(currentLine.charAt(index)));
                              break;
                          default:
-                             System.out.println("Rule must contain ::= in proper location\nLine:"+index);
+                             System.out.println("Rule must contain ::= in proper location\nLine: "+index);
                              System.exit(0);
                      }
                 }else if(state.equals("Pred")){
@@ -206,7 +206,7 @@ public class LL1GrammarParser {
                          case ' ':
                          case '\t':
                          case '|':
-                             System.out.println("Error: Space in word\nLine:"+index);
+                             System.out.println("Error: Space in word\nLine: "+index);
                              System.exit(0);
                              break;
                          case '>':
@@ -280,7 +280,7 @@ public class LL1GrammarParser {
                              if (matched){
                                  currentRule = currentRule + " " + word;
                              }else{
-                                 System.out.println("Terminal not recognized: " + word + "\nLine:" +index);
+                                 System.out.println("Terminal not recognized: " + word + "\nLine: " +index);
                                  System.exit(0);
                              }
                              word = "";
