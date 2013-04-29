@@ -30,6 +30,9 @@ public class LL1ParsingTable {
         makeTable();
     }
 
+/**
+ * Makes sure ALL terminals are tokenized in the rules before trying to make a table
+ * */
     public void convString(){
        for(Definition d : ((Definition[])ALtokens.toArray(new Definition[0]))){
            String s = "";
@@ -38,6 +41,8 @@ public class LL1ParsingTable {
            }
            tokens.put(s, d.name);
        }
+//Simple rebuild by splitting the string and rebuilding it, replacing the
+//tokens as needed
        ArrayList<String> rl = new ArrayList<String>();
        for(int i = 0; i < rules.size(); i++){
            rl.add("");
@@ -63,6 +68,10 @@ public class LL1ParsingTable {
        rules = rl;
     }
 
+/**
+ * Splits strings by spaces
+ * Identical to other use
+ * */
     public String[] spSplit(String s){
         ArrayList<String> a = new ArrayList<String>();
         while(s != ""){
@@ -77,6 +86,9 @@ public class LL1ParsingTable {
         return ((String[])a.toArray(new String[0]));
     }
 
+/**
+ * Finder for normal ArrayLists
+ * */
     public int find (ArrayList l, Object o){
         for(int i = 0; i < l.size(); i++){
             if(o.equals(l.get(i)))
@@ -84,21 +96,29 @@ public class LL1ParsingTable {
         return -1;
     }
 
+/**
+ * Finder for Definition ArrayLists
+ * */
     public int Dfind (ArrayList<Definition> l, Object o){
         for(int i = 0; i < l.size(); i++){
             if(o.equals(l.get(i).name))
                 return i;}
         return -1;
     }
-
+/** This generates a table of the LL(1) parser.
+ * It follows the general guide of the algorithm in the book/notes,
+ * as well.
+ * */
     public void makeTable(){
        indNT = new ArrayList<String>(first.keySet());
        for(int i = 0; i < rules.size(); i++){
            String[] r = spSplit(rules.get(i));
            boolean nu = true;
            for(int j = 2; j < r.length; j++){
+//Don't include <ep..>
                if(r[j].equals("<epsilon>"))
                    break;
+//Non-terminals
                if(r[j].charAt(0) != '<'){
                    if(table[find(indNT,r[0])][Dfind(ALtokens,r[j])] == null){
                        table[find(indNT,r[0])][Dfind(ALtokens,r[j])] = rules.get(i);
@@ -108,6 +128,7 @@ public class LL1ParsingTable {
                    }
                    nu = false;
                    break;
+//Terminals
                }else{
                    for(int k = 0; k < ALtokens.size(); k++){
                        for(String s : first.get(r[j])){
@@ -115,12 +136,13 @@ public class LL1ParsingTable {
                                if(table[find(indNT,r[0])][Dfind(ALtokens,s)] == null){
                                    table[find(indNT,r[0])][Dfind(ALtokens,s)] = rules.get(i);
                                }else{
-                                   System.out.println("Not LL(1) grammar"+ i);
+                                   System.out.println("Not LL(1) grammar");
                                    System.exit(0);
                                }
                            }
                        }
                    }
+//Is this nullable: is there an epsilon?
                    nu = false;
                    for(String s: first.get(r[j])){
                        if(s == "<epsilon>"){
@@ -132,6 +154,7 @@ public class LL1ParsingTable {
                    }
                }
            }
+//If so, handle Follow
            if(nu){
                for(int j = 0; j < ALtokens.size(); j++){
                    if(follow.get(r[0]) != null){
@@ -156,6 +179,9 @@ public class LL1ParsingTable {
        
     }
 
+/**
+ * This turns the parsed token list into something more usable: an Array.
+ * */
     public String[] turnParsedToStrings(){
        ArrayList<String> s = new ArrayList<String>();
        for(int i = 0; i < parsed.size(); i++){
@@ -164,6 +190,11 @@ public class LL1ParsingTable {
        return ((String[])s.toArray(new String[0]));
     }
 
+/**
+ * Used for running the algorithm.
+ * Returns an accept/reject code
+ * This follows the book algorithm almost exactly
+ * */
     public String run(){
        String[] psd = turnParsedToStrings();
        Stack<String> ps = new Stack<String>();
@@ -181,6 +212,7 @@ public class LL1ParsingTable {
                    ps.push(spSplit(ru)[j]);
                }
            }else{
+//The only deviation is checking for epsilon.
                boolean noerr = false;
                for(String r : rules){
                   if(r.equals(ps.peek() + " ::= <epsilon>")){
@@ -190,11 +222,11 @@ public class LL1ParsingTable {
                   }
                }
                if(!noerr)
-                   return "Error";
+                   return "Error : invalid token "+ psd[i] + "at token" + i;
            }
        }
        if(ps.empty() && i >= psd.length)
-           return "Accept";
-       return "Reject";
+           return "File is acceptable";
+       return "Reject : Reached end of statement before end of file";
     }
 }

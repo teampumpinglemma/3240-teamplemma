@@ -2,11 +2,8 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: emilyCheatham
- * Date: 4/25/13
- * Time: 2:31 PM
- * To change this template use File | Settings | File Templates.
+ * Created with Unix cp utility.
+ * User: csmythe
  */
 public class LL1FFSets {
 
@@ -15,7 +12,7 @@ public class LL1FFSets {
     String base = "";
 
     /**
-     * This will be the file that creates the LL(1) Parsing Table, the FIRST sets, and the FOLLOW sets.
+     * This will be the file that creates the the FIRST sets and the FOLLOW sets.
      */
     public LL1FFSets(ArrayList<String> notFormatted)
     {
@@ -28,7 +25,13 @@ public class LL1FFSets {
         createFollowSet();
     }
 
+/**
+ * Formats the rules differently for parsing below.
+ * */
+
     public void reformatRules(ArrayList<String> nf){
+//Hashtables handle things easier.
+//Basically, make an array of right sides and match them to the left sides
         Hashtable<String, ArrayList<String>> m = new Hashtable<String, ArrayList<String>>();
         for(int i = 0; i < nf.size(); i++){
             String id = nf.get(i).substring(0, nf.get(i).indexOf(" "));
@@ -42,7 +45,7 @@ public class LL1FFSets {
             m.get(id).add(predicate);
         }
         rules = new Hashtable<String, String[]>();
-
+//Move from temporary hashtable
         for(String k : m.keySet()){
             rules.put(k, ((String[])m.get(k).toArray(new String[0])));
             //for(int l = 0; l < rules.get(k).length;l++){
@@ -50,6 +53,10 @@ public class LL1FFSets {
           //  }
         }
     }
+/**
+ * Splits an input according to the spaces
+ * Outputs an array of split Strings
+ * */
 
     public String[] spSplit(String s){
         ArrayList<String> a = new ArrayList<String>();
@@ -64,7 +71,9 @@ public class LL1FFSets {
         }
         return ((String[])a.toArray(new String[0]));
     }
-
+/**
+ * Follows the first set pseudocode in Louden
+ * */
     public void createFirstSet(){
         Hashtable <String, ArrayList<String>> f = new Hashtable<String, ArrayList<String>>();
         for(String A: rules.keySet()){
@@ -80,6 +89,7 @@ public class LL1FFSets {
                      String[] pc = spSplit(p);
                      while(cont & k < pc.length){
                          if(pc[k].charAt(0) != '<'){
+//Add terminals directly if not in
                              //System.out.println(pc[k]);
                              if((!f.get(A).contains(pc[k]))){
                                  f.get(A).add(pc[k]);
@@ -88,11 +98,13 @@ public class LL1FFSets {
                          }else if(pc[k].charAt(0) == '<' && !pc[k].equals("<epsilon>")){
                              for(String temp : f.get(pc[k])){
                                  if(!f.get(A).contains(temp) && !temp.equals("<epsilon>")){
+//Add the nonterminals if they are not in
                                      f.get(A).add(temp);
                                      change = true;
                                  }
                              }
                          }else if(pc[k].equals("<epsilon>")){
+//First sets have to handle epsilon too. This is one effective adding method.
                              if(!f.get(A).contains("<epsilon>")){
                                  f.get(A).add("<epsilon>");
                                  change = true;
@@ -123,7 +135,9 @@ public class LL1FFSets {
             System.out.println();*/
         }
     }
-
+/**
+ * Does array contain entry? Answers true or false!
+ * */
     public boolean aContains(String[] a, String in){
         if(a == null)
             return false;
@@ -134,18 +148,21 @@ public class LL1FFSets {
         }
         return false;
     }
+/**
+ * Follows the algorithm in Louden
+ * */
     
     public void createFollowSet(){
         Hashtable<String, ArrayList<String>> f = new Hashtable<String, ArrayList<String>>();
         for(String k: FIRST.keySet()){
             f.put(k, new ArrayList<String>());
         }
-        f.get(base).add("\n");
         boolean change = true;
         while(change){
             change = false;
             for(String A: rules.keySet()){
                 for(String p: rules.get(A)){
+//Required to loop like this for hashing
                     String[] pc = spSplit(p);
                     for(int i = 0; i < pc.length; i++){
                         if(pc[i].charAt(0) == '<' && pc[i] != "<epsilon>"){
@@ -154,10 +171,12 @@ public class LL1FFSets {
                                 if(pc[j].charAt(0) == '<' && pc[j] != "<epsilon>"){
                                     for(String chr: FIRST.get(pc[j])){
                                         if(!f.get(pc[i]).contains(chr) && !chr.equals("<epsilon>")){
+//Nonterminals
                                             f.get(pc[i]).add(chr);
                                             change = true;
                                         }
                                     }
+//Terminals
                                 }else if(pc[j].charAt(0) != '<'){
                                     if(!f.get(pc[i]).contains(pc[j])){
                                         f.get(pc[i]).add(pc[j]);
@@ -168,6 +187,7 @@ public class LL1FFSets {
                                     j = pc.length+1;
                                 }
                             }
+//If a nonterminal
                             if(j == pc.length && pc[i].charAt(0) == '<' && !pc[i].equals("<epsilon>")){
                                 for(String chr:f.get(A)){
                                     if(!f.get(pc[i]).contains(chr) && !chr.equals("<epsilon>")){

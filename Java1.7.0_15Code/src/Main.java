@@ -53,20 +53,19 @@ public class Main {
         }
         TableWalker tw = new TableWalker(regexParser.dfaTable, new File(args[1]), new File(args[3]));
         System.out.println("Success! Check your output files!");
-
+//Part 2, piece 1: parsing the grammar
         LL1GrammarParser parser = new LL1GrammarParser(new File(args[4]), regexParser.specReader.tokens);
         parser.parseGrammar();
 
-
+//piece 2/3: first and follow sets 
         System.out.println("Creating First and Follow Sets: ");
 
         LL1FFSets sets = new LL1FFSets(parser.rules);
 
         System.out.println("Working on the Parsing Table");
-
+//piece 4/5: LL(1) parsing table and running it. Success/reject message here.
         LL1ParsingTable table = new LL1ParsingTable(sets, regexParser.specReader.tokens,tw.parsedTokens, parser.rules);
         System.out.println(table.run());
-        System.out.println("BAM!!");
 
 
     }
