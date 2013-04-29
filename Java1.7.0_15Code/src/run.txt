@@ -1,0 +1,6 @@
+Compilation/Running (mirrored in report)
+Run the files either by executing the run.sh script or through these commands:
+$ javac *.java
+$ java Main <token spec file> <script> <table out> <token out> <grammar spec>
+Neither <table out> not <token out> need exist, but errors in the others will be fatal to the program.
+Output should follow the program's execution.
