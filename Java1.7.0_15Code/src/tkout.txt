@@ -1,0 +1,33 @@
+$BEGIN begin
+$ID matches
+$EQ =
+$FIND find
+$REGEX '([A-Z a-z])*ment([A-Z a-z])*'
+$IN in
+$ASCII-STR "input1.txt"
+$INTERS inters
+$FIND find
+$REGEX '(A|a) ([A-Z a-z])*'
+$IN in
+$ASCII-STR "input2.txt"
+$SEMICOLON ;
+$ID n_matches
+$EQ =
+$HASH #
+$ID matches
+$SEMICOLON ;
+$PRINT print
+$OPENPARENS (
+$ID n_matches
+$CLOSEPARENS )
+$SEMICOLON ;
+$REPLACE replace
+$REGEX '([A-Z a-z])*ment'
+$WITH with
+$ASCII-STR ""
+$IN in
+$ASCII-STR "input1.txt"
+$GRTNOT >!
+$ASCII-STR "output1.txt"
+$SEMICOLON ;
+$END end
